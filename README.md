@@ -41,11 +41,10 @@ $ mkdir -p ~/workspace/catkin_ws/src
 $ cd ~/workspace/catkin_ws
 $ catkin_make
 
-> Note:  out of personal preference, my catkin_ws is created as a subdirectory under ~/workspace
-
 # add catkin_ws path to bashrc
 $ echo "source ~/workspace/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```
+> Note:  out of personal preference, my catkin_ws is created as a subdirectory under ~/workspace
 
 Close and open a new terminal window.
 
