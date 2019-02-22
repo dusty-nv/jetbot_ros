@@ -82,8 +82,8 @@ $ rosrun jetbot_ros jetbot_motors.py
 ```
 
 The `jetbot_motors` node will listen on the following topics:
-* `/jetbot_motors/cmd_dir`     relative direction (degree [-180,180], speed [-1,1])
-* `/jetbot_motors/cmd_raw`     raw L/R motor commands  (speed [-1,1], speed [-1,1])
+* `/jetbot_motors/cmd_dir`     relative heading (degree [-180.0, 180.0], speed [-1.0, 1.0])
+* `/jetbot_motors/cmd_raw`     raw L/R motor commands  (speed [-1.0, 1.0], speed [-1.0, 1.0])
 * `/jetbot_motors/cmd_str`     simple string commands (left/right/forward/backward/stop)
 
 > Note that of 2/22/19, only `cmd_str` method is implemented.  Other methods coming soon.
