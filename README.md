@@ -134,6 +134,10 @@ $ rospack find jetbot_ros
 /home/nvidia/workspace/catkin_ws/src/jetbot_ros
 ```
 
+## Testing JetBot
+
+Next, let's check that the different components of the robot are working under ROS.
+
 ### Running the Nodes
 
 Open a new terminal, and start `roscore`
