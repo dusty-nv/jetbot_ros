@@ -7,9 +7,9 @@ ROS nodes for NVIDIA JetBot with Jetson Nano
 It is assumed that the Nano has been setup with JetPack 4.2 and that CUDA, cuDNN, and TensorRT have been installed.
 
 > **Note**:  the process below will likely exceed the disk capacity of the default 16GB filesystem,  
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with  
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pre-build JetPack-L4T image, the APP partition will automatically be resized to fill the SD card.  
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Otherwise flash with L4T using the -S option (example given for 64GB SD card)  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with JetPack-L4T image,  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the APP partition will automatically be resized to fill the SD card upon first booting the system.  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Otherwise flash with L4T using the -S option (example given for 64GB SD card):  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`sudo ./flash.sh -S 58GiB jetson-nano-sd mmcblk0p1`  
 
 
@@ -122,6 +122,8 @@ $ rospack find ros_deep_learning
 
 ### Build jetbot_ros
 
+Clone and build the [`jetbot_ros`](https://github.com/dusty-nv/jetbot_ros) repo:
+
 ```bash
 # clone the repo
 $ cd ~/workspace/catkin_ws/src
@@ -163,7 +165,6 @@ The `jetbot_motors` node will listen on the following topics:
 ### Testing the Motors
 
 Open a new terminal, and run some test commands:
-(it is recommended to initially test with JetBot up on blocks, wheels not touching the ground)
 
 ```bash
 $ rostopic pub /jetbot_motors/cmd_str std_msgs/String --once "forward"
@@ -172,5 +173,5 @@ $ rostopic pub /jetbot_motors/cmd_str std_msgs/String --once "left"
 $ rostopic pub /jetbot_motors/cmd_str std_msgs/String --once "right"
 $ rostopic pub /jetbot_motors/cmd_str std_msgs/String --once "stop"
 ```
-
+(it is recommended to initially test with JetBot up on blocks, wheels not touching the ground)  
 
