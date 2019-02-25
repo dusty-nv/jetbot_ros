@@ -41,7 +41,10 @@ Close and restart the terminal.
 These Python libraries from Adafruit support the TB6612/PCA9685 motor drivers and the SSD1306 OLED debug display:
 
 ```bash
+# pip should be installed
 $ sudo apt-get install python-pip
+
+# install Adafruit libraries
 $ pip install Adafruit-MotorHAT
 $ pip install Adafruit-SSD1306
 ```
