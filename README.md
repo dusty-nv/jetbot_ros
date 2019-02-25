@@ -190,7 +190,7 @@ $ rosrun jetbot_ros jetbot_oled.py
 
 By default, `jetbot_oled` will refresh the display every second with the latest memory usage, disk space, and IP addresses.
 
-This node will listen on the `/jetbot_oled/user_text` topic to recieve string messages that it will display:
+The node will also listen on the `/jetbot_oled/user_text` topic to recieve string messages from the user that it will display:
 
 ```bash
 rostopic pub /jetbot_oled/user_text std_msgs/String --once "HELLO!"
