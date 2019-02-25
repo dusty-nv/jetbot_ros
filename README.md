@@ -6,36 +6,30 @@ ROS nodes for NVIDIA JetBot with Jetson Nano
 
 It is assumed that the Nano has been setup with JetPack 4.2 and that CUDA, cuDNN, and TensorRT have been installed.
 
-> **Note**:  the process below will likely exceed the disk capacity of the default 16GB filesystem,
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pre-build JetPack-L4T image, the APP partition will automatically be resized to fill the SD card.
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Otherwise flash with L4T using the -S option (example given for 64GB SD card)
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`sudo ./flash.sh -S 58GiB jetson-nano-sd mmcblk0p1`
+> **Note**:  the process below will likely exceed the disk capacity of the default 16GB filesystem,  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pre-build JetPack-L4T image, the APP partition will automatically be resized to fill the SD card.  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Otherwise flash with L4T using the -S option (example given for 64GB SD card)  
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`sudo ./flash.sh -S 58GiB jetson-nano-sd mmcblk0p1`  
 
 
 ### Install ROS Melodic
 
-Enable all Ubuntu packages:
 ```bash
+# enable all Ubuntu packages:
 $ sudo apt-add-repository universe
 $ sudo apt-add-repository multiverse
 $ sudo apt-add-repository restricted
-```
 
-Add ROS repository to apt sources:
-```bash
+# add ROS repository to apt sources
 $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 $ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 0xB01FA116
-```
 
-Install ROS Base:
-```bash
+# install ROS Base
 $ sudo apt-get update
 $ sudo apt-get install ros-melodic-ros-base
-```
 
-Add ROS paths to environment:
-```bash
+# add ROS paths to environment
 sudo sh -c 'echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc'
 ```
 
@@ -63,6 +57,7 @@ $ sudo usermod -aG i2c $USER
 Create a ROS Catkin workspace to contain our ROS packages:
 
 ```bash
+# create the catkin workspace
 $ mkdir -p ~/workspace/catkin_ws/src
 $ cd ~/workspace/catkin_ws
 $ catkin_make
@@ -82,24 +77,31 @@ $ echo $ROS_PACKAGE_PATH
 
 ### Build jetson-inference
 
-Clone and build [`jetson-inference`](https://github.com/dusty-nv/jetson-inference) repo:
+Clone and build the [`jetson-inference`](https://github.com/dusty-nv/jetson-inference) repo:
 
 ```bash
-cd ~/workspace
+# git and cmake should be installed
 sudo apt-get install git cmake
+
+# clone the repo and submodules
+cd ~/workspace
 git clone -b onnx https://github.com/dusty-nv/jetson-inference
 cd jetson-inference
 git submodule update --init
+
+# build from source
 mkdir build
 cd build
 cmake ../
 make
+
+# install libraries
 sudo make install
 ```
 
 ### Build ros_deep_learning
 
-Clone and build [`ros_deep_learning`](https://github.com/dusty-nv/ros_deep_learning) repo:
+Clone and build the [`ros_deep_learning`](https://github.com/dusty-nv/ros_deep_learning) repo:
 
 ```bash
 # install dependencies
