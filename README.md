@@ -38,7 +38,7 @@ Close and restart the terminal.
 
 ### Install Adafruit Libraries
 
-These Python libraries from Adafruit support the TB6612/PCA9685 motor drivers and the SSD1306 OLED debug display:
+These Python libraries from Adafruit support the TB6612/PCA9685 motor drivers and the SSD1306 debug OLED:
 
 ```bash
 # pip should be installed
@@ -147,12 +147,12 @@ $ rospack find jetbot_ros
 
 Next, let's check that the different components of the robot are working under ROS.
 
-### Running the Nodes
-
-Open a new terminal, and start `roscore`
+First open a new terminal, and start `roscore`
 ```bash
 $ roscore
 ```
+
+### Running the Motors
 
 Open a new terminal, and start the `jetbot_motors` node:
 ```bash
@@ -167,8 +167,7 @@ The `jetbot_motors` node will listen on the following topics:
 > Note:  as of 2/22/19, only `cmd_str` method is implemented.  Other methods coming soon.
 
 
-### Testing the Motors
-
+#### Test Motor Commands
 Open a new terminal, and run some test commands:
 
 ```bash
@@ -179,4 +178,21 @@ $ rostopic pub /jetbot_motors/cmd_str std_msgs/String --once "right"
 $ rostopic pub /jetbot_motors/cmd_str std_msgs/String --once "stop"
 ```
 (it is recommended to initially test with JetBot up on blocks, wheels not touching the ground)  
+
+
+### Using the Debug OLED
+
+If you have an SSD1306 debug OLED on your JetBot, you can run the `jetbot_oled` node to display system information and user-defined text:
+
+```bash
+$ rosrun jetbot_ros jetbot_oled.py
+```
+
+By default, `jetbot_oled` will refresh the display every second with the latest memory usage, disk space, and IP addresses.
+
+This node will listen on the `/jetbot_oled/user_text` topic to recieve string messages that it will display:
+
+```bash
+rostopic pub /jetbot_oled/user_text std_msgs/String --once "HELLO!"
+```
 
