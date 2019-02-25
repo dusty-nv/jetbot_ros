@@ -11,11 +11,17 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+find_package(jetson-utils REQUIRED)
+find_package(CUDA REQUIRED)
+find_package(Qt4 REQUIRED)
 
+include(${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -118,7 +124,15 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${CUDA_INCLUDE_DIRS}
 )
+
+include_directories(/usr/include/gstreamer-1.0 /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include/ /usr/lib/aarch64-linux-gnu/glib-2.0/include/ /usr/lib/x86_64-linux-gnu/glib-2.0/include/)
+
+
+# camera node
+add_executable(jetbot_camera src/jetbot_camera.cpp src/image_converter.cpp)
+target_link_libraries(jetbot_camera ${catkin_LIBRARIES} jetson-utils)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
