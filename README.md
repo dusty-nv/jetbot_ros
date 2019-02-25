@@ -55,6 +55,8 @@ Grant your user access to the i2c bus:
 $ sudo usermod -aG i2c $USER
 ```
 
+Reboot the system for the changes to take effect.
+
 ### Create catkin workspace
 
 Create a ROS Catkin workspace to contain our ROS packages:
