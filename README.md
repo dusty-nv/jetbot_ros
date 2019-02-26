@@ -196,3 +196,15 @@ The node will also listen on the `/jetbot_oled/user_text` topic to recieve strin
 rostopic pub /jetbot_oled/user_text std_msgs/String --once "HELLO!"
 ```
 
+### Using the Camera
+
+To begin streaming the JetBot camera, start the `jetbot_camera` node:
+
+```bash
+$ rosrun jetbot_ros jetbot_camera
+```
+
+The video frames will be published to the `jetbot_camera/raw` topic as [`sensor_msgs::Image`](http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html) messages with BGR8 encoding.
+
+
+
