@@ -207,4 +207,9 @@ $ rosrun jetbot_ros jetbot_camera
 The video frames will be published to the `jetbot_camera/raw` topic as [`sensor_msgs::Image`](http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html) messages with BGR8 encoding.
 
 
+## JetBot Model for Gazebo Robotics Simulator
+
+<img src="https://github.com/dusty-nv/jetbot_ros/raw/master/gazebo/jetbot_gazebo_0.png" width="700">
+
+See the [`gazebo`](gazebo) directory of the repo for instructions on using the JetBot simulator model for Gazebo.
 
