@@ -1,0 +1,143 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+	<model name="JetBot">
+		<static>false</static>
+
+		<link name='chassis'>
+			<pose>0.0 0.0 0.043 1.57079632679 0.0 1.57079632679</pose>
+
+			<collision name='collision'>
+				<geometry>
+					<mesh>
+						<scale>0.001 0.001 0.001</scale>
+						<uri>model://jetbot/meshes/JetBot-v3-Chassis.stl</uri>
+					</mesh>
+				</geometry>
+				<surface>
+					<friction>
+						<ode>
+							<mu>0</mu>
+							<mu2>0</mu2>
+							<slip1>1.0</slip1>
+							<slip2>1.0</slip2>
+						</ode>
+					</friction>
+				</surface>
+			</collision>
+
+			<visual name='visual'>
+				<geometry>
+					<mesh>
+						<scale>0.001 0.001 0.001</scale>
+						<uri>model://jetbot/meshes/JetBot-v3-Chassis.stl</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+
+		<link name="left_wheel">
+			<pose>0.03 0.05125 0.03 0.0 0.0 1.57079632679</pose>
+			<collision name="collision">
+				<geometry>
+					<mesh>
+						<scale>0.001 0.001 0.001</scale>
+						<uri>model://jetbot/meshes/JetBot-v3-Wheel.stl</uri>
+					</mesh>
+				</geometry>
+			</collision>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<scale>0.001 0.001 0.001</scale>
+						<uri>model://jetbot/meshes/JetBot-v3-Wheel.stl</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+
+		<link name="right_wheel">
+			<pose>0.03 -0.0595 0.03 0.0 0.0 1.57079632679</pose>
+			<collision name="collision">
+				<geometry>
+					<mesh>
+						<scale>0.001 0.001 0.001</scale>
+						<uri>model://jetbot/meshes/JetBot-v3-Wheel.stl</uri>
+					</mesh>
+				</geometry>
+			</collision>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<scale>0.001 0.001 0.001</scale>
+						<uri>model://jetbot/meshes/JetBot-v3-Wheel.stl</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+
+		<joint type="revolute" name="left_wheel_hinge">
+			<pose>0 0 0 0 0 0</pose>
+			<child>left_wheel</child>
+			<parent>chassis</parent>
+			<axis>
+				<xyz>0 1 0</xyz>
+			</axis>
+		</joint>
+
+		<joint type="revolute" name="right_wheel_hinge">
+			<pose>0 0 0 0 0 0</pose>
+			<child>right_wheel</child>
+			<parent>chassis</parent>
+			<axis>
+				<xyz>0 1 0</xyz>
+			</axis>
+		</joint>
+
+		<link name="camera_link">
+			<gravity>false</gravity>
+			<pose>0.055 0.0 0.0857 0 0.25 0</pose>
+			<inertial>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<box>
+						<size>0.001 0.001 0.001</size>
+					</box>
+				</geometry>
+			</visual>
+			<sensor name="camera" type="camera">
+				<camera>
+					<!--<horizontal_fov>1.047</horizontal_fov>-->
+					<horizontal_fov>2.79253</horizontal_fov>
+					<image>
+						<width>1280</width>
+						<height>720</height>
+					</image>
+					<clip>
+						<near>0.01</near>
+						<far>1</far>
+					</clip>
+					<!--<noise>
+						<type>gaussian</type>
+						<mean>0.0</mean>
+						<stddev>0.007</stddev>
+					</noise>-->
+				</camera>
+				<always_on>1</always_on>
+				<update_rate>10</update_rate>
+				<visualize>true</visualize>
+			</sensor>
+		</link>
+
+		<joint name="camera_joint" type="revolute">
+			<parent>chassis</parent>
+			<child>camera_link</child>
+			<pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+			<axis>
+				<xyz>0.1 0.0 0.0</xyz>
+			</axis>
+		 </joint>
+
+	</model>
+</sdf>
