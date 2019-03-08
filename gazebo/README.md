@@ -13,3 +13,4 @@ $ ./install_jetbot_model.sh
 
 The `jetbot` model will then be symbolically linked to `~/.gazebo/models` and can then be loaded with Gazebo.
 
+> **note**:  to uninstall the model, run `rm ~/.gazebo/models/jetbot`
