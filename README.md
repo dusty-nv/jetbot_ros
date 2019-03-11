@@ -1,5 +1,5 @@
 # jetbot_ros
-ROS nodes for NVIDIA JetBot with Jetson Nano
+ROS nodes and Gazebo model for NVIDIA JetBot with Jetson Nano
 
 
 ## System Configuration
@@ -211,5 +211,5 @@ The video frames will be published to the `jetbot_camera/raw` topic as [`sensor_
 
 <img src="https://github.com/dusty-nv/jetbot_ros/raw/master/gazebo/jetbot_gazebo_0.png" width="700">
 
-See the [`gazebo`](gazebo) directory of the repo for instructions on using the JetBot simulator model for Gazebo.
+See the [`gazebo`](gazebo) directory of the repo for instructions on loading the JetBot simulator model for Gazebo.
 
