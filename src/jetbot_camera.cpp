@@ -53,13 +53,17 @@ bool aquireFrame()
 		ROS_ERROR("failed to capture camera frame");
 		return false;
 	}
+//	for(int i = 0 ; i < 640*480;i++)
+//		if(((unsigned char*)(imgCPU))[i]!=0)
+//			ROS_INFO("%d %d",i,((unsigned char*)(imgCPU))[i]);
 
 	// convert from YUV to RGBA
-	if( !camera->ConvertRGBA(imgCUDA, &imgRGBA) )
+	if( !camera->ConvertBGR8(imgCUDA, &imgRGBA,true) )
 	{
 		ROS_ERROR("failed to convert from NV12 to RGBA");
 		return false;
 	}
+
 
 	// assure correct image size
 	if( !camera_cvt->Resize(camera->GetWidth(), camera->GetHeight()) )
@@ -70,12 +74,20 @@ bool aquireFrame()
 
 	// populate the message
 	sensor_msgs::Image msg;
-
-	if( !camera_cvt->Convert(msg, sensor_msgs::image_encodings::BGR8) )
+/*	if( !camera_cvt->Convert(msg, sensor_msgs::image_encodings::BGR8) )
 	{
 		ROS_ERROR("failed to convert camera frame to sensor_msgs::Image");
 		return false;
-	}
+
+}*/
+	msg.width = camera->GetWidth();
+	msg.height = camera->GetHeight();
+	msg.encoding = "bgr8";
+	msg.step = sizeof(unsigned char)*camera->GetWidth()*3;
+
+	msg.data.push_back(0);
+	msg.data.resize(sizeof(unsigned char)*msg.width*3*msg.height);
+memcpy(msg.data.data(),(unsigned char*)imgRGBA,sizeof(unsigned char)*msg.width*msg.height*3);
 
 	// publish the message
 	camera_pub->publish(msg);
@@ -97,7 +109,7 @@ int main(int argc, char **argv)
 	 */
 	int camera_index = -1;
 
-	private_nh.param<int>("camera_index", camera_index, -1);
+	private_nh.param<int>("camera_index", camera_index, camera_index);
 	
 	ROS_INFO("opening camera device %i", camera_index);
 
@@ -105,7 +117,7 @@ int main(int argc, char **argv)
 	/*
 	 * open camera device
 	 */
-	camera = gstCamera::Create(camera_index);
+	camera = gstCamera::Create(640,480,camera_index);
 
 	if( !camera )
 	{

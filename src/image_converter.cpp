@@ -98,11 +98,11 @@ bool imageConverter::Convert( sensor_msgs::Image& msg, const std::string& encodi
 	
 	size_t px_depth = 0;	 // pixel depth (in bytes) determined below
 	bool   in_place = false;	 // if no conversion required
-
 	// perform colorspace conversion into the desired encoding
 	// in this direction, we reverse use of input/output pointers
 	if( encoding == sensor_msgs::image_encodings::BGR8 )
 	{
+		
 		if( CUDA_FAILED(cudaRGBA32ToBGR8((float4*)mOutputGPU, (uchar3*)mInputGPU, mWidth, mHeight)) )
 		{
 			ROS_ERROR("failed to convert %ux%u RGBA32 image to BGR8 with CUDA", mWidth, mHeight);
