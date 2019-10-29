@@ -4,7 +4,7 @@ ROS nodes and Gazebo model for NVIDIA JetBot with Jetson Nano
 
 ## System Configuration
 
-It is assumed that the Nano has been setup with JetPack 4.2.x and that CUDA, cuDNN, and TensorRT have been installed.
+It is assumed that your Nano's SD card was flashed with NVIDIA's JetPack 4.2.x image - see the [Getting Started](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit) guide.
 
 > **Note**:  the process below will likely exceed the disk capacity of the default 16GB filesystem,  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with JetPack-L4T image,  
