@@ -212,7 +212,7 @@ $ sudo apt-get install ros-melodic-image-view
 $ rosrun image_view image_view image:=/jetbot_camera/raw
 ```
 
-A window should then open displaying the video from the camera.  Click on the terminal or maximize button on the window to enlarge the window to show the entire frame.
+A window should then open displaying the video from the camera.  By default, the window may appear smaller than the video feed and crops the frames.  Click on the terminal or maximize button on the window to enlarge the window to show the entire frame.
 
 
 ## JetBot Model for Gazebo Robotics Simulator
