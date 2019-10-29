@@ -48,9 +48,14 @@ public:
 	bool Convert( const sensor_msgs::ImageConstPtr& input );
 
 	/**
-	 * Convert to ROS sensor_msgs::Image message
+	 * Convert float4 RGBA image from ImageGPU() to ROS sensor_msgs::Image message
 	 */
 	bool Convert( sensor_msgs::Image& msg_out, const std::string& encoding );
+
+	/**
+	 * Convert float4 RGBA image to ROS sensor_msgs::Image message
+	 */
+	bool Convert( sensor_msgs::Image& msg_out, const std::string& encoding, float* imageGPU );
 
 	/**
 	 * Resize the memory (if necessary)
