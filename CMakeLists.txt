@@ -18,10 +18,6 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(jetson-utils REQUIRED)
 find_package(CUDA REQUIRED)
-find_package(Qt4 REQUIRED)
-
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
