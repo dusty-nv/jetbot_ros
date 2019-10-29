@@ -4,7 +4,7 @@ ROS nodes and Gazebo model for NVIDIA JetBot with Jetson Nano
 
 ## System Configuration
 
-It is assumed that the Nano has been setup with JetPack 4.2 and that CUDA, cuDNN, and TensorRT have been installed.
+It is assumed that the Nano has been setup with JetPack 4.2.x and that CUDA, cuDNN, and TensorRT have been installed.
 
 > **Note**:  the process below will likely exceed the disk capacity of the default 16GB filesystem,  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with JetPack-L4T image,  
@@ -23,7 +23,7 @@ $ sudo apt-add-repository restricted
 
 # add ROS repository to apt sources
 $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-$ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 0xB01FA116
+$ sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
 # install ROS Base
 $ sudo apt-get update
@@ -90,7 +90,7 @@ sudo apt-get install git cmake
 
 # clone the repo and submodules
 cd ~/workspace
-git clone -b onnx https://github.com/dusty-nv/jetson-inference
+git clone https://github.com/dusty-nv/jetson-inference
 cd jetson-inference
 git submodule update --init
 
@@ -164,7 +164,7 @@ The `jetbot_motors` node will listen on the following topics:
 * `/jetbot_motors/cmd_raw`     raw L/R motor commands  (speed `[-1.0, 1.0]`, speed `[-1.0, 1.0]`)
 * `/jetbot_motors/cmd_str`     simple string commands (left/right/forward/backward/stop)
 
-> Note:  as of 2/22/19, only `cmd_str` method is implemented.  Other methods coming soon.
+> Note:  currently only `cmd_str` method is implemented.
 
 
 #### Test Motor Commands
@@ -204,7 +204,15 @@ To begin streaming the JetBot camera, start the `jetbot_camera` node:
 $ rosrun jetbot_ros jetbot_camera
 ```
 
-The video frames will be published to the `jetbot_camera/raw` topic as [`sensor_msgs::Image`](http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html) messages with BGR8 encoding.
+The video frames will be published to the `/jetbot_camera/raw` topic as [`sensor_msgs::Image`](http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Image.html) messages with BGR8 encoding.  To test the camera feed, first install the [`image_view`](http://wiki.ros.org/image_view?distro=melodic) package and then subscribe to the `/jetbot_camera/raw` topic in a new terminal:
+
+```bash
+# open a new terminal
+$ sudo apt-get install ros-melodic-image-view
+$ rosrun image_view image_view image:=/jetbot_camera/raw
+```
+
+A window should then open displaying the video from the camera.  Click on the terminal or maximize button on the window to enlarge the window to show the entire frame.
 
 
 ## JetBot Model for Gazebo Robotics Simulator
