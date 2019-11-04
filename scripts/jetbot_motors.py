@@ -4,9 +4,10 @@ import time
 
 from Adafruit_MotorHAT import Adafruit_MotorHAT
 from std_msgs.msg import String
+from geometry_msgs.msg import Twist 
 
-
-
+# distance from middle of jetbot to wheel  (108mm between wheels, halved, and in metres)
+wheel_sep = 108.0/2.0/1000.0
 
 # sets motor speed between [-1.0, 1.0]
 def set_speed(motor_ID, value):
@@ -37,7 +38,23 @@ def all_stop():
 	motor_left.run(Adafruit_MotorHAT.RELEASE)
 	motor_right.run(Adafruit_MotorHAT.RELEASE)
 
+# directional velocity commands (degree, speed)
+def on_cmd_vel(msg):
 
+	vl = msg.linear.y - wheel_sep*msg.angular.z/2
+	vr = msg.linear.y + wheel_sep*msg.angular.z/2
+	if vl > 1.0:
+		vl = 1.0
+	elif vl < -1.0:
+		vl = -1.0
+	if vr > 1.0:
+		vr = 1.0
+	elif vr < -1.0:
+		vr = -1.0
+	rospy.loginfo(rospy.get_caller_id() + ' vl=%f; vr=%f', vl, vr)
+	set_speed(motor_left_ID,  vl)
+	set_speed(motor_right_ID, vr) 
+	
 # directional commands (degree, speed)
 def on_cmd_dir(msg):
 	rospy.loginfo(rospy.get_caller_id() + ' cmd_dir=%s', msg.data)
@@ -86,6 +103,7 @@ if __name__ == '__main__':
 	# setup ros node
 	rospy.init_node('jetbot_motors')
 	
+	rospy.Subscriber('~cmd_vel', Twist, on_cmd_vel)		
 	rospy.Subscriber('~cmd_dir', String, on_cmd_dir)
 	rospy.Subscriber('~cmd_raw', String, on_cmd_raw)
 	rospy.Subscriber('~cmd_str', String, on_cmd_str)
