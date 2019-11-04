@@ -41,8 +41,8 @@ def all_stop():
 # directional velocity commands (degree, speed)
 def on_cmd_vel(msg):
 
-	vl = msg.linear.y - wheel_sep*msg.angular.z/2
-	vr = msg.linear.y + wheel_sep*msg.angular.z/2
+	vl = msg.linear.x - wheel_sep*msg.angular.z/2
+	vr = msg.linear.x + wheel_sep*msg.angular.z/2
 	if vl > 1.0:
 		vl = 1.0
 	elif vl < -1.0:
