@@ -7,7 +7,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist 
 
 # distance from middle of jetbot to wheel  (108mm between wheels, halved, and in metres)
-wheel_sep = 108.0/2.0/1000.0
+wheel_sep = 108.0/2.0/100.0
 
 # sets motor speed between [-1.0, 1.0]
 def set_speed(motor_ID, value):
