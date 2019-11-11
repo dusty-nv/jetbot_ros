@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<robot name="robot">
+  <joint name="robot__left_wheel_hinge" type="continuous">
+    <parent link="robot__chassis"/>
+    <child link="robot__left_wheel"/>
+    <origin rpy="0       0       1.57079" xyz="0.03     0.05125  0.03"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="0" lower="0" upper="0" velocity="0"/>
+  </joint>
+  <joint name="robot__right_wheel_hinge" type="continuous">
+    <parent link="robot__chassis"/>
+    <child link="robot__right_wheel"/>
+    <origin rpy="0       0       1.57079" xyz="0.03   -0.0595  0.03"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="0" lower="0" upper="0" velocity="0"/>
+  </joint>
+  <joint name="robot__camera_joint" type="fixed">
+    <parent link="robot__chassis"/>
+    <child link="robot__camera_link"/>
+    <origin rpy="0    0.25  0" xyz="0.055   0      0.0857"/>
+    <axis xyz="0.96891  0       0.2474"/>
+    <limit effort="0" lower="0" upper="0" velocity="0"/>
+  </joint>
+  <link name="robot__chassis">
+    <inertial>
+      <mass value="0"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision name="robot__collision">
+      <origin rpy="1.57079  0       1.57079" xyz="0     0     0.043"/>
+      <geometry>
+        <mesh filename="package://jetbot_ros/gazebo/jetbot/meshes/JetBot-v3-Chassis.dae" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <visual name="robot__visual">
+      <origin rpy="1.57079  0       1.57079" xyz="0     0     0.043"/>
+      <geometry>
+        <mesh filename="package://jetbot_ros/gazebo/jetbot/meshes/JetBot-v3-Chassis.dae" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="robot__left_wheel">
+    <inertial>
+      <mass value="0"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision name="robot__collision">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <mesh filename="package://jetbot_ros/gazebo/jetbot/meshes/JetBot-v3-Wheel.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <visual name="robot__visual">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <mesh filename="package://jetbot_ros/gazebo/jetbot/meshes/JetBot-v3-Wheel.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="robot__right_wheel">
+    <inertial>
+      <mass value="0"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <collision name="robot__collision">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <mesh filename="package://jetbot_ros/gazebo/jetbot/meshes/JetBot-v3-Wheel.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <visual name="robot__visual">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <mesh filename="package://jetbot_ros/gazebo/jetbot/meshes/JetBot-v3-Wheel.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="robot__camera_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual name="robot__visual">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>
