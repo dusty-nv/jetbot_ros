@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   sensor_msgs
+  controller_manager  
 )
 
 ## System dependencies are found with CMake's conventions
@@ -118,7 +119,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
   ${CUDA_INCLUDE_DIRS}
 )
@@ -129,6 +130,10 @@ include_directories(/usr/include/gstreamer-1.0 /usr/include/glib-2.0 /usr/includ
 # camera node
 add_executable(jetbot_camera src/jetbot_camera.cpp src/image_converter.cpp)
 target_link_libraries(jetbot_camera ${catkin_LIBRARIES} jetson-utils)
+
+# motor controller
+add_executable(jetbot_controller src/motor2927_controller.cpp src/adafruitmotorhat.cpp src/adafruitdcmotor.cpp src/pwm.cpp)
+target_link_libraries(jetbot_controller ${catkin_LIBRARIES})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
