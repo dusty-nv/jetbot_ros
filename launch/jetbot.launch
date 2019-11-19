@@ -17,7 +17,7 @@
   </node>
   
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
 
   <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find jetbot_ros)/map/test_map.yaml"/> -->
