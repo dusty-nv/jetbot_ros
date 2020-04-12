@@ -4,6 +4,7 @@ import time
 
 from Adafruit_MotorHAT import Adafruit_MotorHAT
 from std_msgs.msg import String
+from jetbot_ros.msg import Float32Array
 
 
 
@@ -42,9 +43,22 @@ def all_stop():
 def on_cmd_dir(msg):
 	rospy.loginfo(rospy.get_caller_id() + ' cmd_dir=%s', msg.data)
 
+
 # raw L/R motor commands (speed, speed)
 def on_cmd_raw(msg):
-	rospy.loginfo(rospy.get_caller_id() + ' cmd_raw=%s', msg.data)
+	rospy.loginfo(rospy.get_caller_id() + ' cmd_raw[0]=%s', msg.data[0])
+	rospy.loginfo(rospy.get_caller_id() + ' cmd_raw[1]=%s', msg.data[1])
+
+	if msg.data[0] > 0.01 or msg.data[0] < -0.01:
+		set_speed(motor_left_ID, msg.data[0])
+	else:
+		set_speed(motor_left_ID, 0.)
+
+	if msg.data[1] > 0.01 or msg.data[1] < -0.01:
+		set_speed(motor_right_ID, msg.data[1])
+	else:
+		set_speed(motor_right_ID, 0.)
+
 
 # simple string commands (left/right/forward/backward/stop)
 def on_cmd_str(msg):
@@ -87,7 +101,7 @@ if __name__ == '__main__':
 	rospy.init_node('jetbot_motors')
 	
 	rospy.Subscriber('~cmd_dir', String, on_cmd_dir)
-	rospy.Subscriber('~cmd_raw', String, on_cmd_raw)
+	rospy.Subscriber('~cmd_raw', Float32Array, on_cmd_raw)
 	rospy.Subscriber('~cmd_str', String, on_cmd_str)
 
 	# start running

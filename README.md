@@ -221,3 +221,44 @@ A window should then open displaying the live video from the camera.  By default
 
 See the [`gazebo`](gazebo) directory of the repo for instructions on loading the JetBot simulator model for Gazebo.
 
+## Teleoperate JetBot using (PS4) controller 
+#### Installation and usage of separate packages
+To send motor commands with a controller you will need to do the following:
+On your Jetbot:
+```bash
+# 1. Clone the jetbot topic parse into your src folder of the catkin workspace
+cd /path/to/your/catkin_ws/src
+git clone https://github.com/nwesem/jetbot_topic_parser
+# 2. rebuild your catkin workspace
+cd /path/to/your/catkin_ws
+catkin_make
+# 3. run it using rosrun
+rosrun jetbot_topic_parser jetbot_topic_parser.py
+```
+On another machine (the machine the controller is connected to and assuming that ROS is installed):
+```bash
+# 1. install Joy library on jetbot
+sudo apt install ros-melodic-joy ros-melodic-joystick-drivers
+# 2. set your ROS_MASTER_URI to the one of the Jetson
+export ROS_MASTER_URI=http:<your_jetson_ip>:11311
+# 3. run the node and connect controller (when started the node will automatically search for a controller device)
+rosrun joy joy_node
+```
+#### How to run everything (e.g. after reboot)
+
+Again to summarize: if everything was previously installed and is currently not running, run all packages at the same time like this:
+```bash
+# start ROS core on JetBot
+roscore
+# run all ROS packages on jetbot
+rosrun jetbot_ros jetbot_motors.py
+rosrun jetbot_topic_parser jetbot_topic_parser.py
+# on the machine the controller is connected to change the ROS_MASTER_URI
+export ROS_MASTER_URI=http:<your_jetson_ip>:11311
+# run the joy node 
+#   autorepeat_rate is the rate messages are published with in Hertz (Hz)
+rosrun joy joy_node _autorepeat_rate:=2
+```
+you should be able to control your jetbot using any kind of controller (tested with ps4 controller, bluetooth and wired connectoion).
+
+

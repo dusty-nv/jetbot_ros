@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   sensor_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -49,11 +50,10 @@ find_package(CUDA REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+    FILES
+    Float32Array.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -70,10 +70,10 @@ find_package(CUDA REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,7 +107,7 @@ find_package(CUDA REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES jetbot_ros
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -123,7 +123,15 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
 )
 
-include_directories(/usr/include/gstreamer-1.0 /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include/ /usr/lib/aarch64-linux-gnu/glib-2.0/include/ /usr/lib/x86_64-linux-gnu/glib-2.0/include/)
+include_directories(
+    /usr/include/gstreamer-1.0
+    /usr/include/glib-2.0
+    /usr/include/libxml2
+    /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include
+    /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include/
+    /usr/lib/aarch64-linux-gnu/glib-2.0/include/
+    /usr/lib/x86_64-linux-gnu/glib-2.0/include/
+)
 
 
 # camera node
