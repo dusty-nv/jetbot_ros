@@ -41,17 +41,17 @@ ros::Publisher* camera_pub = NULL;
 // aquire and publish camera frame
 bool aquireFrame()
 {
-	float* imgRGBA = NULL;
+	float4* imgRGBA = NULL;
 
 	// get the latest frame
-	if( !camera->CaptureRGBA(&imgRGBA, 1000) )
+	if( !camera->CaptureRGBA((float**)&imgRGBA, 1000) )
 	{
 		ROS_ERROR("failed to capture camera frame");
 		return false;
 	}
 
 	// assure correct image size
-	if( !camera_cvt->Resize(camera->GetWidth(), camera->GetHeight()) )
+	if( !camera_cvt->Resize(camera->GetWidth(), camera->GetHeight(), IMAGE_RGBA32F) )
 	{
 		ROS_ERROR("failed to resize camera image converter");
 		return false;
@@ -60,7 +60,7 @@ bool aquireFrame()
 	// populate the message
 	sensor_msgs::Image msg;
 
-	if( !camera_cvt->Convert(msg, sensor_msgs::image_encodings::BGR8, imgRGBA) )
+	if( !camera_cvt->Convert(msg, imageConverter::ROSOutputFormat, imgRGBA) )
 	{
 		ROS_ERROR("failed to convert camera frame to sensor_msgs::Image");
 		return false;

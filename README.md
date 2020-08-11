@@ -4,9 +4,9 @@ ROS nodes and Gazebo model for NVIDIA JetBot with Jetson Nano
 
 ## System Configuration
 
-It is assumed that your Nano's SD card was flashed with NVIDIA's JetPack 4.2.x image - see the [Getting Started](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit) guide.
+It is assumed that your Nano's SD card was flashed with NVIDIA's JetPack image - see the [Getting Started](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit) guide.
 
-> **Note**:  the process below will likely exceed the disk capacity of the default 16GB filesystem,  
+> **Note**:  the process below will likely exceed the disk capacity of a 16GB filesystem,  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; so a larger SD card should be used.  If using the 'Etcher' method with JetPack-L4T image,  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the APP partition will automatically be resized to fill the SD card upon first booting the system.  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Otherwise flash with L4T using the -S option (example given for 64GB SD card):  
