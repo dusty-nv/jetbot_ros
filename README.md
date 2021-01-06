@@ -127,12 +127,12 @@ $ rospack find ros_deep_learning
 
 ### Build jetbot_ros
 
-Clone and build the [`jetbot_ros`](https://github.com/dusty-nv/jetbot_ros) repo:
+Clone and build the [`jetbot_ros`](https://github.com/FeeeLyX/jetbot_ros) repo:
 
 ```bash
 # clone the repo
 $ cd ~/workspace/catkin_ws/src
-$ git clone https://github.com/dusty-nv/jetbot_ros
+$ git clone https://github.com/FeeeLyX/jetbot_ros
 
 # build the package
 $ cd ../    # cd ~/workspace/catkin_ws
