@@ -45,8 +45,8 @@ These Python libraries from Adafruit support the TB6612/PCA9685 motor drivers an
 $ sudo apt-get install python-pip
 
 # install Adafruit libraries
-$ pip install Adafruit-MotorHAT
-$ pip install Adafruit-SSD1306
+$ python2 -m pip install Adafruit-MotorHAT
+$ python2 -m pip install Adafruit-SSD1306
 ```
 
 Grant your user access to the i2c bus:
