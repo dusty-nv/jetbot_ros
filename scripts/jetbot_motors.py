@@ -18,7 +18,7 @@ def set_speed(motor_ID, value):
 	elif motor_ID == 2:
 		motor = motor_right
 	else:
-		rospy.logerror('set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
+		rospy.logerr('set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
 		return
 	
 	motor.setSpeed(speed)
@@ -65,7 +65,7 @@ def on_cmd_str(msg):
 	elif msg.data.lower() == "stop":
 		all_stop()
 	else:
-		rospy.logerror(rospy.get_caller_id() + ' invalid cmd_str=%s', msg.data)
+		rospy.logerr(rospy.get_caller_id() + ' invalid cmd_str=%s', msg.data)
 
 
 # initialization
