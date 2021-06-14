@@ -31,9 +31,7 @@
 
 
 
-// globals
-#define DEFAULT_CAMERA -1	// -1 for onboard camera, or change to index of /dev/video V4L2 camera (>=0)	
-		
+// globals	
 gstCamera* camera = NULL;
 
 imageConverter* camera_cvt = NULL;
@@ -43,26 +41,17 @@ ros::Publisher* camera_pub = NULL;
 // aquire and publish camera frame
 bool aquireFrame()
 {
-	void* imgCPU  = NULL;
-	void* imgCUDA = NULL;
-	void* imgRGBA = NULL;
+	float4* imgRGBA = NULL;
 
 	// get the latest frame
-	if( !camera->Capture(&imgCPU, &imgCUDA, 1000) )
+	if( !camera->CaptureRGBA((float**)&imgRGBA, 1000) )
 	{
 		ROS_ERROR("failed to capture camera frame");
 		return false;
 	}
 
-	// convert from YUV to RGBA
-	if( !camera->ConvertRGBA(imgCUDA, &imgRGBA) )
-	{
-		ROS_ERROR("failed to convert from NV12 to RGBA");
-		return false;
-	}
-
 	// assure correct image size
-	if( !camera_cvt->Resize(camera->GetWidth(), camera->GetHeight()) )
+	if( !camera_cvt->Resize(camera->GetWidth(), camera->GetHeight(), IMAGE_RGBA32F) )
 	{
 		ROS_ERROR("failed to resize camera image converter");
 		return false;
@@ -71,7 +60,7 @@ bool aquireFrame()
 	// populate the message
 	sensor_msgs::Image msg;
 
-	if( !camera_cvt->Convert(msg, sensor_msgs::image_encodings::BGR8) )
+	if( !camera_cvt->Convert(msg, imageConverter::ROSOutputFormat, imgRGBA) )
 	{
 		ROS_ERROR("failed to convert camera frame to sensor_msgs::Image");
 		return false;
@@ -95,21 +84,21 @@ int main(int argc, char **argv)
 	/*
 	 * retrieve parameters
 	 */
-	int camera_index = -1;
+	std::string camera_device = "0";	// MIPI CSI camera by default
 
-	private_nh.param<int>("camera_index", camera_index, -1);
+	private_nh.param<std::string>("device", camera_device, camera_device);
 	
-	ROS_INFO("opening camera device %i", camera_index);
+	ROS_INFO("opening camera device %s", camera_device.c_str());
 
 	
 	/*
 	 * open camera device
 	 */
-	camera = gstCamera::Create(camera_index);
+	camera = gstCamera::Create(camera_device.c_str());
 
 	if( !camera )
 	{
-		ROS_ERROR("failed to open camera device %i", camera_index);
+		ROS_ERROR("failed to open camera device %s", camera_device.c_str());
 		return 0;
 	}
 
