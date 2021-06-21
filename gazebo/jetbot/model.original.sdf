@@ -5,11 +5,12 @@
 
 		<link name='chassis'>
 			<pose>0.0 0.0 0.043 1.57079632679 0.0 1.57079632679</pose>
+
 			<collision name='collision'>
 				<geometry>
 					<mesh>
 						<scale>0.001 0.001 0.001</scale>
-						<uri>model://jetbot/meshes/JetBot-v3-Chassis_simplified.stl</uri>
+						<uri>model://jetbot/meshes/JetBot-v3-Chassis.dae</uri>
 					</mesh>
 				</geometry>
 				<surface>
@@ -28,7 +29,7 @@
 				<geometry>
 					<mesh>
 						<scale>0.001 0.001 0.001</scale>
-						<uri>model://jetbot/meshes/JetBot-v3-Chassis_simplified.stl</uri>
+						<uri>model://jetbot/meshes/JetBot-v3-Chassis.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -122,8 +123,8 @@
 					<!--<horizontal_fov>1.047</horizontal_fov>-->
 					<horizontal_fov>2.79253</horizontal_fov>
 					<image>
-						<width>640</width>
-						<height>480</height>
+						<width>1280</width>
+						<height>720</height>
 					</image>
 					<clip>
 						<near>0.01</near>
