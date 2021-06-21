@@ -56,7 +56,7 @@ source docker/tag.sh
 DOCKER_ROOT="/jetbot_ros"	
 
 # generate mount commands
-DATA_VOLUME="--volume $PWD:$DOCKER_ROOT --volume /media/nvidia/SSD_EVO860/py3gazebo:/opt/py3gazebo"
+DATA_VOLUME="--volume $PWD:$DOCKER_ROOT"
 DEV_VOLUME=""
 
 # parse user arguments

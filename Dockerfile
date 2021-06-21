@@ -48,12 +48,8 @@ RUN apt-get update && \
 		  gazebo9-plugin-base \
     && rm -rf /var/lib/apt/lists/*
     
-#RUN git clone https://github.com/wil3/py3gazebo && \
-#    cd py3gazebo && \
-#    cp README.md README.rst && \
-#    python3 setup.py install
-    
-RUN pip3 install protobuf>=2.6 --verbose && \
+RUN git clone https://github.com/dusty-nv/py3gazebo /opt/py3gazebo && \
+    pip3 install protobuf>=2.6 --verbose && \
     pip3 install trollius --verbose
 
 ENV PYTHONPATH=/opt/py3gazebo
