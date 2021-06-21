@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import argparse
 import asyncio
 import pygazebo
 
@@ -10,28 +11,28 @@ from pygazebo.msg import diagnostics_pb2
 
 '''
 gz topic -l
+gz joint -m 'simple_diff' -j right_wheel_hinge --vel-t 0
 '''
 
-class GazeboMessageSubscriber: 
+parser = argparse.ArgumentParser()
 
-    def __init__(self, host, port, timeout=30):
-        self.host = host
-        self.port = port
-        self.loop = asyncio.get_event_loop()
-        self.running = False
-        self.timeout = timeout
+parser.add_argument('--host', default='localhost', type=str)
+parser.add_argument('--port', default=11346, type=int)
+parser.add_argument('--retry', default=30, type=int)
 
-    async def connect(self):
+args = parser.parse_args()
+print(args)
+
+
+def gazebo_connect(host='localhost', port=11346, retry=30):
+    async def _connect(host, port, retry):
         connected = False
-        for i in range(self.timeout):
+        for i in range(retry):
             try:
-                print('awaiting gazebo connection')
-                self.manager = await pygazebo.connect((self.host, self.port))
-                print('namespaces')
-                print(self.manager.namespaces())
-                print('publications')
-                print(self.manager.publications())
+                print(f'waiting for gazebo connection {host}:{port} (attempt={i+1})')
+                manager = await pygazebo.connect((host, port))
                 connected = True
+                print(f'connected to gazebo server {host}:{port}')
                 break
             except Exception as e:
                 print(e)
@@ -41,46 +42,51 @@ class GazeboMessageSubscriber:
         if not connected: 
             raise Exception("Timeout connecting to Gazebo.")
             
-        print('subscribing to topic')
-        #self.poses_subscriber = self.manager.subscribe('/gazebo/default/pose/info', 'gazebo.msgs.PosesStamped', self.poses_callback)
-        #self.subscriber = self.manager.subscribe('/gazebo/default/log/status', 'gazebo.msgs.LogStatus', self.status_callback)
-        self.user_cmd_stats_subscriber = self.manager.subscribe('/gazebo/default/user_cmd_stats', 'gazebo.msgs.UserCmdStats', self.user_cmd_stats_callback)
-        self.subscriber = self.manager.subscribe('/gazebo/default/diagnostics', 'gazebo.msgs.Diagnostics', self.diagnostics_callback)
-        print('waiting for subscriber connection')
-        
-        #await self.poses_subscriber.wait_for_connection()
-        await self.user_cmd_stats_subscriber.wait_for_connection()
-        await self.subscriber.wait_for_connection()
-        
-        #  gz joint -m 'simple_diff' -j right_wheel_hinge --vel-t 0
-        
-        # run loop
-        self.running = True
-        
-        while self.running:
-            await asyncio.sleep(0.1)
+        return manager
 
-    def user_cmd_stats_callback(self, data):
-        print('user_cmd_stats_callback')
+    return asyncio.get_event_loop().run_until_complete(
+            _connect(host, port, retry))
+
+def gazebo_advertise(manager, topic_name, msg_type):
+    async def _advertise(manager, topic_name, msg_type):
+        return await manager.advertise(topic_name, msg_type)
         
-    def diagnostics_callback(self, data):
-        print('diagnostics_callback')
-        diagnostics_msg = diagnostics_pb2.Diagnostics()
-        diagnostics_msg.ParseFromString(data)
-        print(diagnostics_msg)
+    return asyncio.get_event_loop().run_until_complete(
+        _advertise(manager, topic_name, msg_type))
         
-    def status_callback(self, data):
-        print('status_callback')
-        print(data)
-        
-    def poses_callback(self, data):
-        print('poses_callback')
-        self.poses_stamped = pygazebo.msg.v9.poses_stamped_pb2.PosesStamped()
-        self.poses_stamped.ParseFromString(data)
-        
+def gazebo_subscribe(manager, topic_name, msg_type, callback):
+    async def _subscribe(manager, topic_name, msg_type, callback):
+        subscriber = manager.subscribe(topic_name, msg_type, callback)
+        await subscriber.wait_for_connection()
+        return subscriber
+    
+    return asyncio.get_event_loop().run_until_complete(
+            _subscribe(manager, topic_name, msg_type, callback))
+
+# connect to gazebo server    
+manager = gazebo_connect(args.host, args.port, args.retry)
+
+print('namespaces')
+print('  ', manager.namespaces())
+
+print('publications')
+for topic in manager.publications():
+    print('  ', topic)
+
+# subscribe to topics
+def diagnostics_callback(data):
+    print('diagnostics message:')
+    diagnostics_msg = diagnostics_pb2.Diagnostics()
+    diagnostics_msg.ParseFromString(data)
+    print(diagnostics_msg)
+  
+subscriber = gazebo_subscribe(manager, '/gazebo/default/diagnostics', 'gazebo.msgs.Diagnostics', diagnostics_callback)
  
-subscriber = GazeboMessageSubscriber('localhost', 11346) 
+# main loop
+async def run():
+    while True:
+        await asyncio.sleep(0.1)
+ 
+asyncio.get_event_loop().run_until_complete(run())
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(subscriber.connect())
     
