@@ -7,6 +7,11 @@
 		<link name='chassis'>
 			<pose>0 0 .1 0 0 0</pose>
 
+			<inertial>
+				<mass>5</mass>
+				<pose>-.1 0 -.1 0 0 0</pose>
+			</inertial>
+			
 			<collision name='collision'>
 				<geometry>
 				<box>
@@ -150,16 +155,20 @@
 			</visual>
 			<sensor name="camera" type="camera">
 				<camera>
-					<!--<horizontal_fov>1.047</horizontal_fov>-->
-					<horizontal_fov>2.79253</horizontal_fov>
+					<!--<horizontal_fov>1.047</horizontal_fov>
+					<!--<horizontal_fov>2.79253</horizontal_fov>-->
+					<horizontal_fov>2.0</horizontal_fov>
 					<image>
-						<width>640</width>
-						<height>480</height>
+						<width>320</width>
+						<height>240</height>
+						<format>R8G8B8</format>
 					</image>
-					<clip>
+					
+					<!--<clip>
 						<near>0.01</near>
-						<far>1</far>
-					</clip>
+						<far>10</far>
+					</clip>-->
+				
 					<!--<noise>
 						<type>gaussian</type>
 						<mean>0.0</mean>
