@@ -32,12 +32,13 @@ FROM ${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL /bin/bash
+ENV LANG=en_US.UTF-8 
+ENV PYTHONIOENCODING=utf-8
 
 WORKDIR jetbot_ros
 
-
 #
-# install pre-requisite packages
+# install Gazebo
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -50,7 +51,8 @@ RUN apt-get update && \
     
 RUN git clone https://github.com/dusty-nv/py3gazebo /opt/py3gazebo && \
     pip3 install protobuf>=2.6 --verbose && \
-    pip3 install trollius --verbose
+    pip3 install trollius --verbose && \
+    RUN pip3 install pynput --verbose
 
 ENV PYTHONPATH=/opt/py3gazebo
 
