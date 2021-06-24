@@ -38,7 +38,7 @@ ENV PYTHONIOENCODING=utf-8
 WORKDIR jetbot_ros
 
 #
-# install Gazebo
+# install Gazebo and Blender
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -47,12 +47,13 @@ RUN apt-get update && \
 		  gazebo9 \
 		  gazebo9-common \
 		  gazebo9-plugin-base \
+		  blender \
     && rm -rf /var/lib/apt/lists/*
     
 RUN git clone https://github.com/dusty-nv/py3gazebo /opt/py3gazebo && \
     pip3 install protobuf>=2.6 --verbose && \
     pip3 install trollius --verbose && \
-    RUN pip3 install pynput --verbose
+    pip3 install pynput --verbose
 
 ENV PYTHONPATH=/opt/py3gazebo
 
