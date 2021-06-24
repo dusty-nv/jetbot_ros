@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+	<world name="default">
+		<scene>
+			<shadows>false</shadows>
+			<sky>
+				<clouds>
+					<speed>12</speed>
+				</clouds>
+			</sky>
+		</scene> 
+
+		<!-- A global light source -->
+		<include>
+			<uri>model://sun</uri>
+		</include>
+		
+		<!-- A ground plane -->
+		<include>
+			<uri>model://ground_plane_grass</uri>
+		</include>
+		
+		<!-- A dirt path -->
+		<include>
+			<uri>model://dirt_path_curves</uri>
+			<pose>0.0 0.0 0.01 0.0 0.0 0.0</pose>	<!-- Avoid z-fighting with ground plane -->
+		</include>
+		
+		<!-- Robot -->
+		<include>
+			<uri>model://simple_diff</uri>
+			<pose>-.38 -2.64 0.01 0.0 0.0 0.0</pose>
+		</include>
+	</world>
+</sdf>

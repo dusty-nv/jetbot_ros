@@ -1,0 +1,24 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name="dirt_path_curves">
+	<static>true</static>
+	<link name='path'>
+		<collision name='collision'>
+			<geometry>
+				<mesh>
+					<uri>model://dirt_path_curves/dirt_path_curves.dae</uri>
+				</mesh>
+			</geometry>
+		</collision>
+
+		<visual name='visual'>
+			<cast_shadows>false</cast_shadows>
+			<geometry>
+				<mesh>
+					<uri>model://dirt_path_curves/dirt_path_curves.dae</uri>
+				</mesh>
+			</geometry>
+		</visual>
+	</link>
+  </model>
+</sdf>
