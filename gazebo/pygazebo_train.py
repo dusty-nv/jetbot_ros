@@ -61,11 +61,11 @@ nav_model = NavigationModel(args.model)
 
 # setup dataset
 data_classes = [
-    'backward',
+    #'backward',
     'forward',
     'left',
     'right',
-    'stop'
+    #'stop'
 ]
 
 for cls in data_classes:
@@ -144,9 +144,10 @@ def on_image(data):
     #print('')
     
     if mode == 'collect':
-        img_path = os.path.join(args.dataset, drive_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg")
-        Image.fromarray(img).save(img_path)
-        print(f"saved {msg.image.width}x{msg.image.height} image to '{img_path}'")
+        if drive_dir in data_classes:
+            img_path = os.path.join(args.dataset, drive_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg")
+            Image.fromarray(img).save(img_path)
+            print(f"saved {msg.image.width}x{msg.image.height} image to '{img_path}'")
     elif mode == 'infer':
         global last_img
         last_img = Image.fromarray(img)
@@ -181,9 +182,9 @@ def on_release(key):
         if key.char == 'c':
             mode = 'collect' if mode != 'collect' else None
         elif key.char == 't':
-            mode = 'train'
+            mode = 'train' if mode != 'train' else None
         elif key.char == 'i':
-            mode = 'infer'
+            mode = 'infer' if mode != 'infer' else None
             
     except AttributeError:
         key_states[key] = False
