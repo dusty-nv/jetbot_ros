@@ -64,8 +64,7 @@ class NavigationModel:
     
     def infer(self, image):
         image = self.data_transforms(image).unsqueeze(0).cuda()
-        print(image.shape)
-        
+
         self.model.eval()
         
         with torch.no_grad():
@@ -75,18 +74,18 @@ class NavigationModel:
             
         return cls.item(), prob.item()
         
-    def train(self, dataset, epochs=10, batch_size=1, workers=1, learning_rate=0.1, train_split=0.8, print_freq=10, 
-              save=f"data/models/{datetime.now().strftime('%Y%m%d%H%M')}"):
+    def train(self, dataset, epochs=10, batch_size=1, workers=1, learning_rate=0.01, train_split=0.8, print_freq=10, 
+              use_class_weights=True, save=f"data/models/{datetime.now().strftime('%Y%m%d%H%M')}"):
         """
         Train the model on a dataset
         """
-        train_loader, val_loader = self.load_dataset(dataset, batch_size, workers, train_split)
+        train_loader, val_loader, class_weights = self.load_dataset(dataset, batch_size, workers, train_split)
         
         self.model.cuda()
         
         # setup model, loss function, and solver
-        criterion  = nn.CrossEntropyLoss().cuda()
-        optimizer  = torch.optim.SGD(self.model.parameters(), learning_rate, momentum=0.9, weight_decay=1e-4)
+        criterion = nn.CrossEntropyLoss(weight=torch.Tensor(class_weights) if use_class_weights else None).cuda()
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)   
         
         best_accuracy = -1.0
         
@@ -116,13 +115,17 @@ class NavigationModel:
                 train_loss += loss
                 
                 if i % print_freq == 0:
-                    print(f"Epoch {epoch}:  train=[{i}/{len(train_loader)}]  loss={train_loss/(i+1):.8f}  accuracy={train_accuracy/(i+1):.8f}  {images.shape}")
+                    print(f"Epoch {epoch}:  train=[{i}/{len(train_loader)}]  loss={train_loss/(i+1):.8f}  accuracy={train_accuracy/(i+1):.8f}")
             
             train_loss /= len(train_loader)
             train_accuracy /= len(train_loader)
             
-            val_loss, val_accuracy = self.validate(val_loader, criterion, epoch, print_freq)
-            
+            if val_loader is not None:
+                val_loss, val_accuracy = self.validate(val_loader, criterion, epoch, print_freq)
+            else:
+                val_loss = train_loss
+                val_accuracy = train_accuracy
+                
             print(f"Epoch {epoch}:  train_loss={train_loss:.8f}  train_accuracy={train_accuracy:.8f}")
             print(f"Epoch {epoch}:  val_loss={val_loss:.8f}  val_accuracy={val_accuracy:.8f}")
             
@@ -208,35 +211,64 @@ class NavigationModel:
         dataset = datasets.ImageFolder(dataset, self.data_transforms)
           
         # split into train/val
-        lengths = [int(len(dataset) * train_split)]
-        lengths.append(len(dataset) - lengths[0])
+        if train_split > 0:
+            lengths = [int(len(dataset) * train_split)]
+            lengths.append(len(dataset) - lengths[0])
 
-        train_dataset, val_dataset = torch.utils.data.random_split(
-            dataset, lengths, 
-            generator=torch.Generator().manual_seed(1))
-
+            train_dataset, val_dataset = torch.utils.data.random_split(
+                dataset, lengths, 
+                generator=torch.Generator().manual_seed(1))
+                
+            val_loader = torch.utils.data.DataLoader(
+                val_dataset, batch_size=batch_size, num_workers=workers,
+                shuffle=False, pin_memory=True)
+        else:
+            train_dataset = dataset
+            val_dataset = None
+            val_loader = None
+            
         # create dataloaders
         train_loader = torch.utils.data.DataLoader(
             train_dataset, batch_size=batch_size, num_workers=workers,
             shuffle=True, pin_memory=True)
-            
-        val_loader = torch.utils.data.DataLoader(
-            val_dataset, batch_size=batch_size, num_workers=workers,
-            shuffle=False, pin_memory=True)
-            
+
         # reshape model if needed     
         dataset_classes = len(dataset.classes)
         
         print(f'=> dataset classes: {dataset_classes} ({str(dataset.classes)})')
         print(f'=> train samples:   {len(train_dataset)}')
-        print(f'=> val samples:     {len(val_dataset)}')
+        print(f'=> val samples:     {len(val_dataset) if val_dataset is not None else 0}')
         
         if self.num_classes != dataset_classes:
             self.model = reshape_model(self.model, self.model_arch, dataset_classes)
             self.num_classes = dataset_classes
             
-        return train_loader, val_loader
+        # get class weights
+        class_weights, class_counts = self.get_class_weights(dataset)
+        
+        print('=> class distribution:')
+        
+        for idx, (weight, count) in enumerate(zip(class_weights, class_counts)):
+            print(f'     [{idx}] - {count} samples ({count/sum(class_counts):.4f}), weight {weight:.8f}')
+            
+        return train_loader, val_loader, class_weights
  
+    def get_class_weights(self, dataset):
+        counts = [0] * len(dataset.classes) 
+        weights = [0.] * len(dataset.classes)   
+        
+        for item in dataset.imgs:                                                         
+            counts[item[1]] += 1                                                     
+                                            
+        max_count = max(counts)
+        
+        for i in range(len(dataset.classes)):   
+            if counts[i] > 0:
+                weights[i] = max_count / counts[i]   
+            else:
+                weights[i] = 1.0
+                
+        return weights, counts          
  
 if __name__ == '__main__':
     import argparse
@@ -247,9 +279,10 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', default='data/dataset', type=str)
     parser.add_argument('--epochs', default=10, type=int)
     parser.add_argument('--batch-size', default=1, type=int)
-
+    parser.add_argument('--train-split', default=0.8, type=float)
+    
     args = parser.parse_args()
     print(args)
     
     model = NavigationModel(args.model)
-    model.train(args.dataset, epochs=args.epochs, batch_size=args.batch_size)
+    model.train(args.dataset, epochs=args.epochs, batch_size=args.batch_size, train_split=args.train_split)
