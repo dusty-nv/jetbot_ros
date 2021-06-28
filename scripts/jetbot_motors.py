@@ -2,29 +2,58 @@
 import rospy
 import time
 
-import qwiic_scmd
+import qwiic
+from Adafruit_MotorHAT import Adafruit_MotorHAT
+
 from std_msgs.msg import String
 
 
 # sets motor speed between [-1.0, 1.0]
 def set_speed(motor_ID, value):
-	max_pwm = 115.0
-	#speed = int(min(max(abs(value * max_pwm), 0), max_pwm))
-	speed = int(value * max_pwm)
+	if 96 in addresses:
+		max_pwm = 115.0
+		speed = int(min(max(abs(value * max_pwm), 0), max_pwm))
 
-	if motor_ID == 1 or 2:
-		motor_driver.set_drive(motor_ID - 1, 0, speed)
-	else:
-		rospy.logerror('set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
-		return
+		if motor_ID == 1:
+			motor = motor_left
+		elif motor_ID == 2:
+			motor = motor_right
+		else:
+			rospy.logerror('set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
+			return
+
+		motor.setSpeed(speed)
+
+		if value > 0:
+			motor.run(Adafruit_MotorHAT.FORWARD)
+		else:
+			motor.run(Adafruit_MotorHAT.BACKWARD)
+
+	elif 93 in addresses:
+		max_speed = 255
+		speed = int(value * max_speed)
+
+		if motor_ID == 1 or 2:
+			motor_driver.set_drive(motor_ID - 1, 0, speed)
+		else:
+			rospy.logerror('set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
+			return
 
 
 # stops all motors
 def all_stop():
-	motor_driver.set_drive(0,0,0)
-	motor_driver.set_drive(1,0,0)
+	if 96 in addresses:
+		motor_left.setSpeed(0)
+		motor_right.setSpeed(0)
 
-	motor_driver.disable()
+		motor_left.run(Adafruit_MotorHAT.RELEASE)
+		motor_right.run(Adafruit_MotorHAT.RELEASE)
+	
+	elif 93 in addresses:
+		motor_driver.set_drive(0,0,0)
+		motor_driver.set_drive(1,0,0)
+
+		motor_driver.disable()
 
 
 # directional commands (degree, speed)
@@ -65,23 +94,30 @@ def on_cmd_str(msg):
 # initialization
 if __name__ == '__main__':
 
-	# setup motor controller
-	motor_driver = qwiic_scmd.QwiicScmd()
+	# Scan for devices on I2C bus
+	addresses = qwiic.scan()
 
 	motor_left_ID = 1
 	motor_right_ID = 2
 
-	print(motor_left_ID)	
+	if 96 in addresses:
+		# setup motor controller
+		motor_driver = Adafruit_MotorHAT(i2c_bus=1)
 
-	#motor_left = motor_driver.getMotor(motor_left_ID)
-	#motor_right = motor_driver.getMotor(motor_right_ID)
-	
+		motor_left = motor_driver.getMotor(motor_left_ID)
+		motor_right = motor_driver.getMotor(motor_right_ID)
+
+	elif 93 in addresses:
+		# setup motor controller
+		motor_driver = qwiic.QwiicScmd()
+
+
 	# stop the motors as precaution
 	all_stop()
 
 	# setup ros node
 	rospy.init_node('jetbot_motors')
-	
+
 	rospy.Subscriber('~cmd_dir', String, on_cmd_dir)
 	rospy.Subscriber('~cmd_raw', String, on_cmd_raw)
 	rospy.Subscriber('~cmd_str', String, on_cmd_str)
