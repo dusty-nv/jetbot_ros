@@ -47,6 +47,9 @@ $ sudo apt-get install python-pip
 # install Adafruit libraries
 $ pip install Adafruit-MotorHAT
 $ pip install Adafruit-SSD1306
+
+# Install SparkFun Python packages
+$ pip install sparkfun-qwiic
 ```
 
 Grant your user access to the i2c bus:
