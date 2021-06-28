@@ -35,6 +35,7 @@ def set_speed(motor_ID, value):
 
 		if motor_ID == 1 or 2:
 			motor_driver.set_drive(motor_ID - 1, 0, speed)
+			motor_driver.enable()
 		else:
 			rospy.logerror('set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
 			return
@@ -72,19 +73,15 @@ def on_cmd_str(msg):
 	if msg.data.lower() == "left":
 		set_speed(motor_left_ID,  -1.0)
 		set_speed(motor_right_ID,  1.0)
-		motor_driver.enable()
 	elif msg.data.lower() == "right":
 		set_speed(motor_left_ID,   1.0)
 		set_speed(motor_right_ID, -1.0)
-		motor_driver.enable()
 	elif msg.data.lower() == "forward":
 		set_speed(motor_left_ID,   1.0)
 		set_speed(motor_right_ID,  1.0)
-		motor_driver.enable()
 	elif msg.data.lower() == "backward":
 		set_speed(motor_left_ID,  -1.0)
 		set_speed(motor_right_ID, -1.0)  
-		motor_driver.enable()
 	elif msg.data.lower() == "stop":
 		all_stop()
 	else:
