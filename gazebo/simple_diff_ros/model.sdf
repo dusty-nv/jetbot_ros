@@ -1,6 +1,5 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
-	<!-- http://gazebosim.org/tutorials?tut=build_robot&cat=build_robot -->
 	<model name="simple_diff">
 		<static>false</static>
 		 
@@ -178,12 +177,51 @@
 				<always_on>1</always_on>
 				<update_rate>10</update_rate>
 				<visualize>true</visualize>
+				<plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+					<ros>
+						<namespace>/simple_diff</namespace>
+						<!-- TODO(louise) Remapping not working due to https://github.com/ros-perception/image_common/issues/93 -->
+						<!--<remapping>image_raw:=image_demo</remapping>
+						<remapping>camera_info:=camera_info_demo</remapping>-->
+					</ros>
+					<!-- camera_name>omit so it defaults to sensor name</camera_name-->
+					<!-- frame_name>omit so it defaults to link name</frame_name-->
+				</plugin>
 			</sensor>
 		</link>
 
 		<joint name="camera_joint" type="fixed">
 			<parent>chassis</parent>
 			<child>camera_link</child>
-		</joint>
+		</joint>	
+
+		<!-- Controls the differential drive robot -->
+		<plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+			<ros>
+				<namespace>/simple_diff</namespace>
+				<remapping>cmd_vel:=cmd_vel</remapping>
+				<remapping>odom:=odom</remapping>
+			</ros>
+
+			<!-- wheels -->
+			<left_joint>left_wheel_hinge</left_joint>
+			<right_joint>right_wheel_hinge</right_joint>
+
+			<!-- kinematics -->
+			<wheel_separation>0.2</wheel_separation>
+			<wheel_diameter>0.2</wheel_diameter>
+
+			<!-- limits -->
+			<max_wheel_torque>10</max_wheel_torque>
+			<max_wheel_acceleration>0.25</max_wheel_acceleration>
+
+			<!-- output -->
+			<publish_odom>true</publish_odom>
+			<publish_odom_tf>true</publish_odom_tf>
+			<publish_wheel_tf>true</publish_wheel_tf>
+
+			<odometry_frame>odom</odometry_frame>
+			<robot_base_frame>chassis</robot_base_frame>
+		</plugin>   		
 	</model>
 </sdf>

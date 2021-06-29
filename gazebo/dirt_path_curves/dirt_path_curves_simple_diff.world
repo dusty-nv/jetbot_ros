@@ -23,7 +23,7 @@
 		<!-- A dirt path -->
 		<include>
 			<uri>model://dirt_path_curves</uri>
-			<pose>0.0 0.0 0.01 0.0 0.0 0.0</pose>	<!-- Avoid z-fighting with ground plane -->
+			<pose>0.0 0.0 0.001 0.0 0.0 0.0</pose>	<!-- Avoid z-fighting with ground plane -->
 		</include>
 		
 		<!-- Robot -->
