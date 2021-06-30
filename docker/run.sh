@@ -53,7 +53,7 @@ die() {
 source docker/tag.sh
 
 # where the project resides inside docker
-DOCKER_ROOT="/jetbot_ros"	
+DOCKER_ROOT="/workspace/src/jetbot_ros"	
 
 # generate mount commands
 DATA_VOLUME="--volume $PWD:$DOCKER_ROOT"

@@ -35,7 +35,7 @@ ENV SHELL /bin/bash
 ENV LANG=en_US.UTF-8 
 ENV PYTHONIOENCODING=utf-8
 
-WORKDIR jetbot_ros
+WORKDIR /tmp
 
 #
 # install Gazebo and Blender
@@ -57,9 +57,6 @@ RUN git clone https://github.com/dusty-nv/py3gazebo /opt/py3gazebo && \
     pip3 install pynput --verbose
 
 ENV PYTHONPATH=/opt/py3gazebo
-
-ENV GAZEBO_MODEL_PATH=/usr/share/gazebo-9/models:/root/.gazebo/models:/jetbot_ros/gazebo
-ENV GAZEBO_MASTER_URI=http://localhost:11346
 
 
 #
@@ -95,6 +92,11 @@ RUN apt-get update && \
 		ros-eloquent-launch-xml \
 		ros-eloquent-launch-yaml \
 		ros-eloquent-vision-msgs \
+		ros-eloquent-gazebo-ros \
+		ros-eloquent-gazebo-msgs \
+		ros-eloquent-gazebo-ros-pkgs \
+		ros-eloquent-gazebo-plugins \
+		ros-eloquent-turtlebot3* \
 		libpython3-dev \
 		python3-colcon-common-extensions \
 		python3-rosdep \
@@ -115,20 +117,17 @@ RUN git clone --branch yaml-cpp-0.6.0 https://github.com/jbeder/yaml-cpp yaml-cp
     cmake -DBUILD_SHARED_LIBS=ON .. && \
     make -j$(nproc) && \
     cp libyaml-cpp.so.0.6.0 /usr/lib/aarch64-linux-gnu/ && \
-    ln -s /usr/lib/aarch64-linux-gnu/libyaml-cpp.so.0.6.0 /usr/lib/aarch64-linux-gnu/libyaml-cpp.so.0.6 && \
-    rm -rf yaml-cpp-0.6
+    ln -s /usr/lib/aarch64-linux-gnu/libyaml-cpp.so.0.6.0 /usr/lib/aarch64-linux-gnu/libyaml-cpp.so.0.6
 
-# gazebo_ros packages
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-		ros-eloquent-gazebo-ros \
-		ros-eloquent-gazebo-msgs \
-		ros-eloquent-gazebo-ros-pkgs \
-		ros-eloquent-gazebo-plugins \
-		ros-eloquent-turtlebot3* \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
-    
+
+#
+# environment setup
+#   
+ENV GAZEBO_MODEL_PATH=/usr/share/gazebo-9/models:/root/.gazebo/models:/jetbot_ros/gazebo
+ENV GAZEBO_MASTER_URI=http://localhost:11346
+
+WORKDIR /workspace/src
+
 # setup entrypoint
 COPY ros_entrypoint.sh /ros_entrypoint.sh
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc
