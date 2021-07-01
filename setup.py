@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from glob import glob
 from itertools import chain
 
@@ -6,15 +6,14 @@ import os
 
 package_name = 'jetbot_ros'
 
-def generate_data_files():
+def generate_data_files(dirs=['launch', 'gazebo/worlds', 'gazebo/models']):
+    """
+    Generate recursive list of data files, without listing directories in the output.
+    """
     data_files = []
-    data_dirs = ['launch', 'gazebo/worlds', 'gazebo/models']
-    for path, dirs, files in chain.from_iterable(os.walk(data_dir) for data_dir in data_dirs):
-        if path.startswith('gazebo/'):  # remove gazebo/ dir prefix
-            install_path = path[len('gazebo/'):]
-        else:
-            install_path = path
-        install_dir = os.path.join('share', package_name, install_path)
+    for path, _, files in chain.from_iterable(os.walk(dir) for dir in dirs):
+        install_dir = path[len('gazebo/'):] if path.startswith('gazebo/') else path  # remove gazebo/ prefix
+        install_dir = os.path.join('share', package_name, install_dir)
         list_entry = (install_dir, [os.path.join(path, f) for f in files if not f.startswith('.')])
         data_files.append(list_entry)
     return data_files
@@ -22,7 +21,7 @@ def generate_data_files():
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -37,6 +36,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'gazebo_spawn = jetbot_ros.gazebo_spawn:main',
+            'teleop_keyboard = jetbot_ros.teleop_keyboard:main',
+            'nav_model = jetbot_ros.nav_model:main',
         ],
     },
 )
