@@ -28,7 +28,19 @@ def generate_launch_description():
                         arguments=['simple_diff_ros', 'jetbot', '-.3', '-2.65', '0.0'],
                         output='screen')
  
+    nav_model = Node(package='jetbot_ros', node_executable='nav_model',
+                     parameters=[
+                        {"model": "/workspace/src/jetbot_ros/data/models/202106282129/model_best.pth"},
+                        {"visualize": True},
+                     ],
+                     remappings=[
+                        ("/jetbot/nav_model/image_in", "/jetbot/camera/image_raw"),
+                        ("/jetbot/nav_model/cmd_vel", "/jetbot/cmd_vel"),
+                     ],
+                     output='screen')              
+                     
     return LaunchDescription([
         gazebo,
         spawn_entity,
+        nav_model
     ])
