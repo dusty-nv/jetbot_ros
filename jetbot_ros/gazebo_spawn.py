@@ -16,7 +16,7 @@ def main():
     rclpy.init()
 
     # Create the node
-    node = rclpy.create_node("entity_spawner")
+    node = rclpy.create_node("entity_spawner", namespace="jetbot")
 
     # Show progress in the terminal window
     node.get_logger().info(
@@ -32,14 +32,14 @@ def main():
     # Get path to the robot
     sdf_file_path = os.path.join(
         get_package_share_directory("jetbot_ros"), "models",
-        "simple_diff_ros", "model.sdf")
+        argv[0], "model.sdf")
 
     # Show file path
     print(f"robot_sdf={sdf_file_path}")
     
     # Set data for request
     request = SpawnEntity.Request()
-    request.name = argv[0]
+    request.name = argv[1] #argv[0]
     request.xml = open(sdf_file_path, 'r').read()
     request.robot_namespace = argv[1]
     request.initial_pose.position.x = float(argv[2])
