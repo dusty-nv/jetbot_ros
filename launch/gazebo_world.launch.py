@@ -28,8 +28,8 @@ def generate_launch_description():
     #spawn_entity = Node(package='gazebo_ros', node_executable='spawn_entity.py',
     #                    arguments=['-entity', 'demo', 'x', 'y', 'z'],
     #                    output='screen')
-    spawn_entity = Node(package='jetbot_ros', executable='gazebo_spawn',
-                        arguments=['simple_diff', 'jetbot', '-1.5', '-4.0', '0.0'],
+    spawn_entity = Node(package='jetbot_ros', node_executable='gazebo_spawn',   # FYI 'node_executable' is renamed to 'executable' in Foxy
+                        arguments=['simple_diff_ros', 'jetbot', '-.3', '-2.65', '0.0'],
                         output='screen')
  
     return LaunchDescription([
