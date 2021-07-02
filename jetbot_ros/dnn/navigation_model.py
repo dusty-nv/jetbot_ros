@@ -15,8 +15,9 @@ import torchvision.models as models
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 from datetime import datetime
 
-from .reshape_model import reshape_model
-from .xy_dataset import XYDataset
+from jetbot_ros.dnn.reshape_model import reshape_model
+from jetbot_ros.dnn.xy_dataset import XYDataset
+
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
@@ -67,7 +68,7 @@ class NavigationModel:
             self.model_arch = checkpoint['arch']
             self.num_outputs = checkpoint['num_outputs']
             
-            self.model = models.__dict__[self.model_arch](pretrained=True)
+            self.model = models.__dict__[self.model_arch](pretrained=False)
             self.model = reshape_model(self.model, self.model_arch, self.num_outputs)
             
             self.model.load_state_dict(checkpoint['state_dict'])
@@ -360,23 +361,4 @@ class NavigationModel:
             return default
 
         return int(str[idx+1:])
-        
-if __name__ == '__main__':
-    import argparse
-    
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--model', default='resnet18', type=str)
-    parser.add_argument('--type', default='classification', type=str)
-    parser.add_argument('--dataset', default='data/dataset', type=str)
-    parser.add_argument('--epochs', default=10, type=int)
-    parser.add_argument('--batch-size', default=1, type=int)
-    parser.add_argument('--learning-rate', default=0.01, type=float)
-    parser.add_argument('--scheduler', default='StepLR_75', type=str)
-    parser.add_argument('--train-split', default=0.8, type=float)
-    
-    args = parser.parse_args()
-    print(args)
-    
-    model = NavigationModel(args.model, type=args.type)
-    model.train(args.dataset, epochs=args.epochs, batch_size=args.batch_size, train_split=args.train_split)
+ 
