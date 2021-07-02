@@ -40,6 +40,8 @@ import sys
 import rclpy
 
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
+
 from rclpy.qos import QoSProfile
 
 if os.name == 'nt':
@@ -66,6 +68,8 @@ w/x : increase/decrease linear velocity
 a/d : increase/decrease angular velocity
 
 space key, s : force stop
+
+c : collect data (when in data collection mode)
 
 CTRL-C to quit
 """
@@ -134,7 +138,8 @@ def main():
     qos = QoSProfile(depth=10)
     node = rclpy.create_node('teleop_keyboard', namespace='jetbot')
     pub = node.create_publisher(Twist, 'cmd_vel', qos)
-
+    key_pub = node.create_publisher(String, 'keys', qos)
+    
     status = 0
     target_linear_velocity = 0.0
     target_angular_velocity = 0.0
@@ -145,25 +150,31 @@ def main():
         print(msg)
         while(1):
             key = get_key(settings)
+            
+            if len(key) > 0:
+                key_msg = String()
+                key_msg.data = key
+                key_pub.publish(key_msg)
+            
             if key == 'w':
                 target_linear_velocity =\
                     check_linear_limit_velocity(target_linear_velocity + LIN_VEL_STEP_SIZE)
-                status = status + 1
+                #status = status + 1
                 print_vels(target_linear_velocity, target_angular_velocity)
             elif key == 'x':
                 target_linear_velocity =\
                     check_linear_limit_velocity(target_linear_velocity - LIN_VEL_STEP_SIZE)
-                status = status + 1
+                #status = status + 1
                 print_vels(target_linear_velocity, target_angular_velocity)
             elif key == 'a':
                 target_angular_velocity =\
                     check_angular_limit_velocity(target_angular_velocity + ANG_VEL_STEP_SIZE)
-                status = status + 1
+                #status = status + 1
                 print_vels(target_linear_velocity, target_angular_velocity)
             elif key == 'd':
                 target_angular_velocity =\
                     check_angular_limit_velocity(target_angular_velocity - ANG_VEL_STEP_SIZE)
-                status = status + 1
+                #status = status + 1
                 print_vels(target_linear_velocity, target_angular_velocity)
             elif key == ' ' or key == 's':
                 target_linear_velocity = 0.0
@@ -172,7 +183,9 @@ def main():
             else:
                 if (key == '\x03'):
                     break
-
+            
+            status += 1
+            
             if status == 20:
                 print(msg)
                 status = 0
