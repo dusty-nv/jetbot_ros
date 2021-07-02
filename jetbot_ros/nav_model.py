@@ -7,10 +7,11 @@ import PIL
 import cv2
 
 from rclpy.node import Node
+
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 
-from .dnn.navigation_model import NavigationModel
+from jetbot_ros.dnn.navigation_model import NavigationModel
 
 
 class NavModelNode(Node):
@@ -18,10 +19,10 @@ class NavModelNode(Node):
     Navigation model ROS node that uses PyTorch on camera images
     """
     def __init__(self):
-        super().__init__('nav_model', namespace='jetbot/nav_model')
+        super().__init__('nav_model', namespace='jetbot')
         
         # create topics
-        self.image_subscriber = self.create_subscription(Image, 'image_in', self.image_listener, 10)
+        self.image_subscriber = self.create_subscription(Image, 'camera/image_raw', self.image_listener, 10)
         self.velocity_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
         
         # get node parameters
@@ -45,7 +46,7 @@ class NavModelNode(Node):
 
     def image_listener(self, msg):
         self.get_logger().debug(f"recieved image:  {msg.width}x{msg.height}, {msg.encoding}")
-        self.get_logger().debug(str(msg.header))
+        #self.get_logger().debug(str(msg.header))
 
         if msg.encoding != 'rgb8':
             raise ValueError(f"image encoding is '{msg.encoding}' (expected rgb8)")
