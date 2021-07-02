@@ -62,7 +62,7 @@ ENV PYTHONPATH=/opt/py3gazebo
 #
 # install ROS2
 #
-ARG ROS_PKG=ros_base
+ARG ROS_PKG=desktop
 ENV ROS_DISTRO=eloquent
 ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
 
@@ -96,10 +96,10 @@ RUN apt-get update && \
 		ros-eloquent-gazebo-msgs \
 		ros-eloquent-gazebo-ros-pkgs \
 		ros-eloquent-gazebo-plugins \
-		ros-eloquent-turtlebot3* \
 		libpython3-dev \
 		python3-colcon-common-extensions \
 		python3-rosdep \
+		xterm \
     && rm -rf /var/lib/apt/lists/*
 
 # init/update rosdep
@@ -123,13 +123,17 @@ RUN git clone --branch yaml-cpp-0.6.0 https://github.com/jbeder/yaml-cpp yaml-cp
 #
 # environment setup
 #   
-ENV GAZEBO_MODEL_PATH=/usr/share/gazebo-9/models:/root/.gazebo/models:/jetbot_ros/gazebo
+ENV GAZEBO_MODEL_PATH=/usr/share/gazebo-9/models:/root/.gazebo/models:/workspace/src/jetbot_ros/gazebo/models
 ENV GAZEBO_MASTER_URI=http://localhost:11346
 
-WORKDIR /workspace/src
+# setup workspace
+WORKDIR /workspace
+
+COPY scripts/setup_workspace.sh /workspace/setup_workspace.sh
+ENV PYTHONPATH="/workspace/src/jetbot_ros:${PYTHONPATH}"
 
 # setup entrypoint
-COPY ros_entrypoint.sh /ros_entrypoint.sh
+COPY scripts/ros_entrypoint.sh /ros_entrypoint.sh
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
