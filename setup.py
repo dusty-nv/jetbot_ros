@@ -38,6 +38,7 @@ setup(
         'console_scripts': [
             'gazebo_spawn = jetbot_ros.gazebo_spawn:main',
             'teleop_keyboard = jetbot_ros.teleop_keyboard:main',
+            'data_collection = jetbot_ros.data_collection:main',
             'nav_model = jetbot_ros.nav_model:main',
         ],
     },
