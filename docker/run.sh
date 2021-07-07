@@ -13,7 +13,8 @@ show_help() {
     echo " "
     echo "usage: Starts the Docker container and runs a user-specified command"
     echo " "
-    echo "   ./docker/run.sh --container DOCKER_IMAGE"
+    echo "   ./docker/run.sh --ros ROS_DISTRO "
+    echo "                   --container DOCKER_IMAGE"
     echo "                   --volume HOST_DIR:MOUNT_DIR"
     echo "                   --run RUN_COMMAND"
     echo " "
@@ -21,19 +22,22 @@ show_help() {
     echo " "
     echo "   --help                       Show this help text and quit"
     echo " "
-    echo "   -c, --container DOCKER_IMAGE Specifies the name of the Docker container"
-    echo "                                image to use (default: 'l4t-ml')"
+    echo "   --ros ROS_DISTRO  ROS distro to use:  eloquent, foxy (default is foxy)"
+    echo "                     This option sets the container image to use."
+    echo " "
+    echo "   -c, --container DOCKER_IMAGE  Manually specify the name/tag of the Docker"
+    echo "                                 container to use, overriding --ros option."
     echo " "
     echo "   -d, --dev  Runs the container in development mode, where the source"
     echo "              files are mounted into the container dynamically, so they"
     echo "              can more easily be edited from the host machine."
     echo " "
-    echo "   -v, --volume HOST_DIR:MOUNT_DIR Mount a path from the host system into"
-    echo "                                   the container.  Should be specified as:"
+    echo "   -v, --volume HOST_DIR:MOUNT_DIR  Mount a path from the host system into"
+    echo "                                    the container.  Should be specified as:"
     echo " "
-    echo "                                      -v /my/host/path:/my/container/path"
+    echo "                                       -v /my/host/path:/my/container/path"
     echo " "
-    echo "                                   (these should be absolute paths)"
+    echo "                                    (these should be absolute paths)"
     echo " "
     echo "   -r, --run RUN_COMMAND  Command to run once the container is started."
     echo "                          Note that this argument must be invoked last,"
@@ -60,6 +64,7 @@ DATA_VOLUME="--volume $PWD:$DOCKER_ROOT"
 DEV_VOLUME=""
 
 # parse user arguments
+ROS_DISTRO="foxy"
 USER_VOLUME=""
 USER_COMMAND=""
 
@@ -68,6 +73,20 @@ while :; do
         -h|-\?|--help)
             show_help    # Display a usage synopsis.
             exit
+            ;;
+	   --ros)       # Takes an option argument; ensure it has been specified.
+            if [ "$2" ]; then
+                ROS_DISTRO=$2
+                shift
+            else
+                die 'ERROR: "--ros" requires a non-empty option argument.'
+            fi
+            ;;
+        --ros=?*)
+            ROS_DISTRO=${1#*=} # Delete everything up to "=" and assign the remainder.
+            ;;
+        --ros=)         # Handle the case of an empty --image=
+            die 'ERROR: "--ros" requires a non-empty option argument.'
             ;;
         -c|--container)       # Takes an option argument; ensure it has been specified.
             if [ "$2" ]; then
@@ -121,6 +140,10 @@ while :; do
 
     shift
 done
+
+if [ -z "$CONTAINER_IMAGE" ]; then
+	CONTAINER_IMAGE="jetbot_ros:$ROS_DISTRO-$TAG"
+fi
 
 echo "CONTAINER:     $CONTAINER_IMAGE"
 echo "DEV_VOLUME:    $DEV_VOLUME"
