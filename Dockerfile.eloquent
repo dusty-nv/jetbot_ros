@@ -48,6 +48,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
             cmake \
 		  nano \
+		  xterm \
             libgazebo9-dev \
 		  gazebo9 \
 		  gazebo9-common \
