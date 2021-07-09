@@ -20,7 +20,10 @@ def generate_launch_description():
                         {"model": "/workspace/src/jetbot_ros/data/models/202106282129/model_best.pth"},
                         {"visualize": True},
                      ],
-                     output='screen')              
+                     output='screen',
+                     emulate_tty=True,
+                     #arguments=[('__log_level:=debug')]
+                )              
                      
     return LaunchDescription([
         nav_model

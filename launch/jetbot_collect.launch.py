@@ -11,11 +11,12 @@ def generate_launch_description():
     
     teleop_keyboard = Node(package='jetbot_ros', node_executable='teleop_keyboard',
                            prefix='xterm -e',
-                           output='screen')              
+                           output='screen',
+                           emulate_tty=True)              
       
     data_collection = Node(package='jetbot_ros', node_executable='data_collection',
                            parameters=[{"data_path": "/workspace/src/jetbot_ros/data/my_dataset"}],
-                           output='screen') 
+                           output='screen', emulate_tty=True) 
                            
     return LaunchDescription([
         teleop_keyboard,

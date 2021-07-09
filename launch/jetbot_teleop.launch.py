@@ -11,7 +11,8 @@ def generate_launch_description():
     
     teleop_keyboard = Node(package='jetbot_ros', node_executable='teleop_keyboard',
                            prefix='xterm -e',
-                           output='screen')              
+                           output='screen',
+                           emulate_tty=True)              
        
     return LaunchDescription([
         teleop_keyboard
