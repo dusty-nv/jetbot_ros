@@ -145,6 +145,10 @@ if [ -z "$CONTAINER_IMAGE" ]; then
 	CONTAINER_IMAGE="jetbot_ros:$ROS_DISTRO-$TAG"
 fi
 
+if [[ "$(sudo docker images -q $CONTAINER_IMAGE 2> /dev/null)" == "" ]]; then
+	CONTAINER_IMAGE="dustynv/$CONTAINER_IMAGE"
+fi
+	
 echo "CONTAINER:     $CONTAINER_IMAGE"
 echo "DEV_VOLUME:    $DEV_VOLUME"
 echo "DATA_VOLUME:   $DATA_VOLUME"
