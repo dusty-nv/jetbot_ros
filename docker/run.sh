@@ -60,7 +60,7 @@ source docker/tag.sh
 DOCKER_ROOT="/workspace/src/jetbot_ros"	
 
 # generate mount commands
-DATA_VOLUME="--volume $PWD:$DOCKER_ROOT"
+DATA_VOLUME="--volume $PWD/data:$DOCKER_ROOT/data"
 DEV_VOLUME=""
 
 # parse user arguments
@@ -103,7 +103,7 @@ while :; do
             die 'ERROR: "--container" requires a non-empty option argument.'
             ;;
 	   -d|--dev)
-            #DEV_VOLUME="--volume $PWD/jetson_voice:$DOCKER_ROOT/jetson_voice --volume $PWD/examples:$DOCKER_ROOT/examples --volume $PWD/scripts:$DOCKER_ROOT/scripts --volume $PWD/tests:$DOCKER_ROOT/tests"
+            DEV_VOLUME="--volume $PWD:$DOCKER_ROOT"
             ;;
         -v|--volume)
             if [ "$2" ]; then
