@@ -127,31 +127,63 @@ RUN git clone --branch yaml-cpp-0.6.0 https://github.com/jbeder/yaml-cpp yaml-cp
 
 
 #
+# environment setup
+#   
+ENV WORKSPACE_ROOT=/workspace
+ENV JETBOT_ROOT=${WORKSPACE_ROOT}/src/jetbot_ros
+ARG ROS_ENVIRONMENT=${ROS_ROOT}/setup.bash
+
+ENV GAZEBO_MODEL_PATH=/usr/share/gazebo-9/models:/root/.gazebo/models:${JETBOT_ROOT}/gazebo/models
+ENV GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:${JETBOT_ROOT}/gazebo/plugins/build/:/usr/local/lib/
+ENV GAZEBO_MASTER_URI=http://localhost:11346
+
+# setup workspace
+WORKDIR ${WORKSPACE_ROOT}
+
+COPY scripts/setup_workspace.sh ${WORKSPACE_ROOT}/setup_workspace.sh
+ENV PYTHONPATH="${JETBOT_ROOT}:${PYTHONPATH}"
+
+
+#
 # ros_deep_learning package
 #
-RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
-    mkdir -p /workspace/src && \
-    cd /workspace/src && \
+RUN source ${ROS_ENVIRONMENT} && \
+    mkdir -p ${WORKSPACE_ROOT}/src && \
+    cd ${WORKSPACE_ROOT}/src && \
     git clone https://github.com/dusty-nv/ros_deep_learning && \
     cd ../ && \
     colcon build --symlink-install --event-handlers console_direct+
 
 
 #
-# environment setup
-#   
-ENV GAZEBO_MODEL_PATH=/usr/share/gazebo-9/models:/root/.gazebo/models:/workspace/src/jetbot_ros/gazebo/models
-ENV GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:/workspace/src/jetbot_ros/gazebo/plugins/build/
-ENV GAZEBO_MASTER_URI=http://localhost:11346
+# build project
+#
+COPY jetbot_ros ${JETBOT_ROOT}/jetbot_ros
+COPY launch ${JETBOT_ROOT}/launch
+COPY gazebo ${JETBOT_ROOT}/gazebo
+COPY resource ${JETBOT_ROOT}/resource
 
-# setup workspace
-WORKDIR /workspace
+COPY package.xml ${JETBOT_ROOT}
+COPY setup.py ${JETBOT_ROOT}
+COPY setup.cfg ${JETBOT_ROOT}
 
-COPY scripts/setup_workspace.sh /workspace/setup_workspace.sh
-ENV PYTHONPATH="/workspace/src/jetbot_ros:${PYTHONPATH}"
+RUN cd ${JETBOT_ROOT}/gazebo/plugins/ && \
+    mkdir build && \
+    cd build && \
+    cmake ../ && \
+    make -j$(nproc) && \
+    make install
+    
+RUN source ${ROS_ENVIRONMENT} && \
+    cd ${WORKSPACE_ROOT} && \
+    colcon build --symlink-install --event-handlers console_direct+
 
+
+#
 # setup entrypoint
+#
 COPY scripts/ros_entrypoint.sh /ros_entrypoint.sh
-RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc
+RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc && \
+    echo 'source ${WORKSPACE_ROOT}/install/local_setup.bash' >> /root/.bashrc
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
