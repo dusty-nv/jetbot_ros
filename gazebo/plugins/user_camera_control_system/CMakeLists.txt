@@ -1,3 +1,4 @@
 
-add_library(user_camera_control_system SHARED user_camera_control_system.cpp)
-target_link_libraries(user_camera_control_system ${GAZEBO_LIBRARIES})
+add_library(gazebo_user_camera_control_system SHARED user_camera_control_system.cpp)
+target_link_libraries(gazebo_user_camera_control_system ${GAZEBO_LIBRARIES})
+install(TARGETS gazebo_user_camera_control_system DESTINATION lib)

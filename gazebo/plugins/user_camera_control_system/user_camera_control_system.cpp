@@ -15,8 +15,8 @@ namespace gazebo
 	 *
 	 * Example commands:
 	 *
-	 *   export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:/workspace/src/jetbot_ros/gazebo/plugins/build/
-	 *   gazebo -g libuser_camera_control_system.so worlds/maze_obstacles_simple_diff.world
+	 *   export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:/usr/local/lib/:/workspace/src/jetbot_ros/gazebo/plugins/build/
+	 *   gazebo -g libgazebo_user_camera_control_system.so worlds/maze_obstacles_simple_diff.world
 	 *
 	 *   or add to /root/.gazebo/gui.ini 
 	 *

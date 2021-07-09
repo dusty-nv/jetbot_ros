@@ -16,12 +16,12 @@ namespace gazebo
 	 *
 	 * Example commands:
 	 *
-	 *   export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:/workspace/src/jetbot_ros/gazebo/plugins/build/
+	 *   export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:/usr/local/lib/:/workspace/src/jetbot_ros/gazebo/plugins/build/
 	 *
 	 *   add to world SDF:
 	 *
 	 *      <gui>
-	 *		<plugin name="user_camera_control" filename="libuser_camera_control.so">
+	 *		<plugin name="user_camera_control" filename="libgazebo_user_camera_control.so">
 	 *			<render_rate>40.0</render_rate>
 	 *		</plugin>
 	 *	   </gui>
@@ -33,7 +33,7 @@ namespace gazebo
       *     y=0
 	 *	  
 	 *     [overlay_plugins]
-	 *     filenames=libuser_camera_control.so
+	 *     filenames=libgazebo_user_camera_control.so
 	 *
 	 *	  [user_camera]
 	 *	  render_rate=20 
