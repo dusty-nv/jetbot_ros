@@ -2,7 +2,7 @@
 #set -e
 
 printf "Building workspace...\n\n"
-colcon build --symlink-install
+colcon build --symlink-install --event-handlers console_direct+
 
 printf "\nSourcing install/local_setup.bash\n"
 source install/local_setup.bash
