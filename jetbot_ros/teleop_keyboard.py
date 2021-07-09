@@ -94,7 +94,7 @@ def get_key(settings):
 
 
 def print_vels(target_linear_velocity, target_angular_velocity):
-    print('currently:\tlinear velocity {0}\t angular velocity {1} '.format(
+    print('currently:\tlinear velocity {0:.03f}\t angular velocity {1:.03f} '.format(
         target_linear_velocity,
         target_angular_velocity))
 
