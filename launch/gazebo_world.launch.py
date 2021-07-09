@@ -20,7 +20,10 @@ def generate_launch_description():
     launch_file_dir = os.path.join(pkg_dir, 'launch')
  
     gazebo = ExecuteProcess(
-                cmd=['gazebo', '--verbose', world, '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so'],
+                cmd=['gazebo', '--verbose', world, 
+                     '-s', 'libgazebo_ros_init.so', 
+                     '-s', 'libgazebo_ros_factory.so',
+                     '-g', 'libgazebo_user_camera_control_system.so'],
                 output='screen', emulate_tty=True)
  
     spawn_entity = Node(package='jetbot_ros', node_executable='gazebo_spawn',   # FYI 'node_executable' is renamed to 'executable' in Foxy
