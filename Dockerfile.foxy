@@ -169,6 +169,12 @@ RUN cd ${ROS_ROOT} && \
     
 
 #
+# JetBot hw controllers
+#
+RUN pip3 install Adafruit-MotorHAT Adafruit-SSD1306 --verbose
+
+
+#
 # environment setup
 #   
 ENV WORKSPACE_ROOT=/workspace

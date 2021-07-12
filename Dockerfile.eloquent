@@ -127,6 +127,12 @@ RUN git clone --branch yaml-cpp-0.6.0 https://github.com/jbeder/yaml-cpp yaml-cp
 
 
 #
+# JetBot hw controllers
+#
+RUN pip3 install Adafruit-MotorHAT Adafruit-SSD1306 --verbose
+
+
+#
 # environment setup
 #   
 ENV WORKSPACE_ROOT=/workspace
