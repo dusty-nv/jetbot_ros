@@ -49,6 +49,7 @@ RUN apt-get update && \
             cmake \
 		  nano \
 		  xterm \
+		  lxterminal \
             libgazebo9-dev \
 		  gazebo9 \
 		  gazebo9-common \
