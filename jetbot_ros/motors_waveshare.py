@@ -1,12 +1,15 @@
 import rclpy
 
+from rclpy.node import Node
 from jetbot_ros.motors import MotorController
+
 from Adafruit_MotorHAT import Adafruit_MotorHAT
 
 
-class MotorControllerNV(MotorController):
+
+class MotorControllerWaveshare(MotorController):
     """
-    Motor controller node that supports the original NVIDIA JetBot.
+    Motor controller node that supports the Waveshare JetBot.
     @see motors.py for the base class to implement different controllers.
     """
     MOTOR_LEFT = 1      # left motor ID
@@ -24,6 +27,11 @@ class MotorControllerNV(MotorController):
             self.MOTOR_RIGHT : self.driver.getMotor(self.MOTOR_RIGHT)
         }
         
+        self.pwm_channels = {
+            self.MOTOR_LEFT : (1, 0),
+            self.MOTOR_RIGHT : (2, 3)
+        }
+        
     def set_speed(self, left, right):
         """
         Sets the motor speeds between [-1.0, 1.0]
@@ -35,22 +43,28 @@ class MotorControllerNV(MotorController):
         # apply trim and convert [-1,1] to PWM value
         pwm = int(min(max((abs(value) + trim) * self.max_pwm, 0), self.max_pwm))
         self.motors[motor].setSpeed(pwm)
-        
+
         # set the motor direction
-        cmd = Adafruit_MotorHAT.RELEASE
+        ina, inb = self.pwm_channels[motor]
         
         if value > 0:
-            cmd = Adafruit_MotorHAT.FORWARD
+            self.motors[motor].run(Adafruit_MotorHAT.FORWARD)
+            self.driver._pwm.setPWM(ina, 0, pwm * 16)
+            self.driver._pwm.setPWM(inb, 0, 0)
         elif value < 0:
-            cmd = Adafruit_MotorHAT.BACKWARD
-            
-        self.motors[motor].run(cmd)
+            self.motors[motor].run(Adafruit_MotorHAT.BACKWARD)
+            self.driver._pwm.setPWM(ina, 0, 0)
+            self.driver._pwm.setPWM(inb, 0, pwm * 16)
+        else:
+            self.motors[motor].run(Adafruit_MotorHAT.RELEASE)
+            self.driver._pwm.setPWM(ina, 0, 0)
+            self.driver._pwm.setPWM(inb, 0, 0)
  
 
 def main(args=None):
     rclpy.init(args=args)
     
-    node = MotorControllerNV()
+    node = MotorControllerWaveshare()
     node.get_logger().info("listening for velocity messages...")
     
     rclpy.spin(node)
