@@ -24,6 +24,7 @@ def generate_launch_description():
                             {"resource": "csi://0"},
                             {"width": 1280},
                             {"height": 720},
+                            {"flip": "rotate-180"},
                         ],
                         remappings=[
                             ("/video_source/raw", "/jetbot/camera/image_raw"),
