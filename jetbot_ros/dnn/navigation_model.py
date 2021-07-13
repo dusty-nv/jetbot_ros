@@ -30,7 +30,7 @@ class NavigationModel:
     """
     Model for navigation
     """
-    def __init__(self, model, type='regression', resolution=224):
+    def __init__(self, model, type='regression', resolution=224, warmup=5):
         """
         Create or load a model.
         """
@@ -79,6 +79,16 @@ class NavigationModel:
             self.model_arch = model
             self.num_outputs = 1000    # default classes for torchvision models
     
+        self.model.cuda()
+        
+        # warmup model inference
+        for i in range(warmup):
+            self.model.eval()
+            
+            with torch.no_grad():
+                input = torch.ones((1, 3, resolution, resolution)).cuda()
+                output = self.model(input)
+            
     @property
     def classification(self):
         return self.type == 'classification'
