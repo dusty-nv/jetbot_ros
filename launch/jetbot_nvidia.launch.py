@@ -22,8 +22,9 @@ def generate_launch_description():
     video_source = Node(package='ros_deep_learning', node_executable='video_source',
                         parameters=[
                             {"resource": "csi://0"},
-                            {"width": 1280},
-                            {"height": 720},
+                            {"width": 640},
+                            {"height": 480},
+                            {"framerate": 15},
                             {"flip": "rotate-180"},
                         ],
                         remappings=[
