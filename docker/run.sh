@@ -185,5 +185,6 @@ sudo docker run --runtime nvidia -it --rm --name jetbot_ros \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -v /tmp/argus_socket:/tmp/argus_socket \
+    -v /etc/enctune.conf:/etc/enctune.conf \
     $MOUNTS $CONTAINER_IMAGE $USER_COMMAND
 	    
