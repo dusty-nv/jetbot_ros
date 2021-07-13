@@ -41,6 +41,8 @@ setup(
             'data_collection = jetbot_ros.data_collection:main',
             'nav_model = jetbot_ros.nav_model:main',
             'motors_nvidia = jetbot_ros.motors_nvidia:main',
+            'motors_waveshare = jetbot_ros.motors_waveshare:main',
+            'oled_ssd1306 = jetbot_ros.oled_ssd1306:main',
         ],
     },
 )
