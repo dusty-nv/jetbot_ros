@@ -43,6 +43,7 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 
 from rclpy.qos import QoSProfile
+from rcl_interfaces.msg import SetParametersResult
 
 if os.name == 'nt':
     import msvcrt
@@ -50,8 +51,8 @@ else:
     import termios
     import tty
 
-JETBOT_MAX_LIN_VEL = 0.2
-JETBOT_MAX_ANG_VEL = 2.0
+JETBOT_MAX_LIN_VEL = 0.2    # parameter /jetbot/teleop_keyboard/max_linear_vel   (.63172 for real JetBot)
+JETBOT_MAX_ANG_VEL = 2.0    # parameter /jetbot/teleop_keyboard/max_angular_vel  (12.5 for real JetBot)
 
 LIN_VEL_STEP_SIZE = 0.01
 ANG_VEL_STEP_SIZE = 0.1
@@ -127,8 +128,25 @@ def check_linear_limit_velocity(velocity):
 def check_angular_limit_velocity(velocity):
     return constrain(velocity, -JETBOT_MAX_ANG_VEL, JETBOT_MAX_ANG_VEL)
 
+def parameters_callback(params):
+    global JETBOT_MAX_LIN_VEL
+    global JETBOT_MAX_ANG_VEL
+    
+    for param in params:
+        if param.name == 'max_linear_vel':
+            self.max_linear_vel = param.value
+        elif param.name == 'max_angular_vel':
+            self.max_angular_vel = param.value
+        else:
+            raise ValueError(f'unknown parameter {param.name}')
+            
+    return SetParametersResult(successful=True)
+
 
 def main():
+    global JETBOT_MAX_LIN_VEL
+    global JETBOT_MAX_ANG_VEL
+    
     settings = None
     if os.name != 'nt':
         settings = termios.tcgetattr(sys.stdin)
@@ -139,6 +157,16 @@ def main():
     node = rclpy.create_node('teleop_keyboard', namespace='jetbot')
     pub = node.create_publisher(Twist, 'cmd_vel', qos)
     key_pub = node.create_publisher(String, 'keys', qos)
+    
+    node.declare_parameter('max_linear_vel', JETBOT_MAX_LIN_VEL)
+    node.declare_parameter('max_angular_vel', JETBOT_MAX_ANG_VEL)
+    
+    JETBOT_MAX_LIN_VEL = node.get_parameter('max_linear_vel').value
+    JETBOT_MAX_ANG_VEL = node.get_parameter('max_angular_vel').value
+    
+    node.add_on_set_parameters_callback(parameters_callback)
+    
+    print('JETBOT_MAX_LIN_VEL', JETBOT_MAX_LIN_VEL)
     
     status = 0
     target_linear_velocity = 0.0
@@ -195,20 +223,20 @@ def main():
             control_linear_velocity = make_simple_profile(
                 control_linear_velocity,
                 target_linear_velocity,
-                (LIN_VEL_STEP_SIZE / 2.0))
+                LIN_VEL_STEP_SIZE) #(LIN_VEL_STEP_SIZE / 2.0))
 
-            twist.linear.x = control_linear_velocity
+            twist.linear.x = float(control_linear_velocity)
             twist.linear.y = 0.0
             twist.linear.z = 0.0
 
             control_angular_velocity = make_simple_profile(
                 control_angular_velocity,
                 target_angular_velocity,
-                (ANG_VEL_STEP_SIZE / 2.0))
+                ANG_VEL_STEP_SIZE) #(ANG_VEL_STEP_SIZE / 2.0))
 
             twist.angular.x = 0.0
             twist.angular.y = 0.0
-            twist.angular.z = control_angular_velocity
+            twist.angular.z = float(control_angular_velocity)
 
             print_vels(control_linear_velocity, control_angular_velocity)
             pub.publish(twist)
