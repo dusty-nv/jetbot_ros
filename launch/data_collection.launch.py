@@ -1,24 +1,28 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import ThisLaunchFileDir,LaunchConfiguration
+from launch.substitutions import ThisLaunchFileDir, LaunchConfiguration
 from launch_ros.actions import Node
+
+from datetime import datetime
+
 
 
 def generate_launch_description():
     
-    teleop_keyboard = Node(package='jetbot_ros', node_executable='teleop_keyboard',
-                           prefix='xterm -e',
-                           output='screen',
-                           emulate_tty=True)              
+    teleop_keyboard = IncludeLaunchDescription(PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/teleop_keyboard.launch.py']))
       
+    data_root = '/workspace/src/jetbot_ros/data/datasets'
+    data_path = DeclareLaunchArgument('data_path', default_value=f"{data_root}/{datetime.now().strftime('%Y%m%d-%H%M%S')}")
+
     data_collection = Node(package='jetbot_ros', node_executable='data_collection',
-                           parameters=[{"data_path": "/workspace/src/jetbot_ros/data/my_dataset"}],
+                           parameters=[{"data_path": LaunchConfiguration('data_path')}],
                            output='screen', emulate_tty=True) 
                            
     return LaunchDescription([
         teleop_keyboard,
+        data_path,
         data_collection
     ])

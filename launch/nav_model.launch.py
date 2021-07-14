@@ -6,18 +6,14 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import ThisLaunchFileDir,LaunchConfiguration
 from launch_ros.actions import Node
 
-'''
-remappings=[
-    ("/jetbot/nav_model/image_in", "/jetbot/camera/image_raw"),
-    ("/jetbot/nav_model/cmd_vel", "/jetbot/cmd_vel"),
-],
-'''
                      
 def generate_launch_description():
     
+    model_arg = DeclareLaunchArgument('model')
+    
     nav_model = Node(package='jetbot_ros', node_executable='nav_model',
                      parameters=[
-                        {"model": "/workspace/src/jetbot_ros/data/models/202106282129/model_best.pth"},
+                        {"model": LaunchConfiguration('model')},
                         {"visualize": True},
                      ],
                      output='screen',
@@ -26,5 +22,6 @@ def generate_launch_description():
                 )              
                      
     return LaunchDescription([
+        model_arg,
         nav_model
     ])
