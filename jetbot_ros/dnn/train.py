@@ -27,5 +27,5 @@ print(args)
 model = NavigationModel(args.model, type=args.type)
 
 # train the model
-model.train(args.dataset, epochs=args.epochs, batch_size=args.batch_size, learning_rate=args.learning_rate,
+model.train(args.data, epochs=args.epochs, batch_size=args.batch_size, learning_rate=args.learning_rate,
             scheduler=args.scheduler, workers=args.workers, train_split=args.train_split, save=args.save)
