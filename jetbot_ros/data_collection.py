@@ -2,6 +2,7 @@ import os
 import sys
 import math
 import rclpy
+import fnmatch
 import numpy as np
 import cv2
 
@@ -65,6 +66,7 @@ class DataCollectionNode(Node):
             img_path = os.path.join(self.data_path, f"xy_{self.xy_label[0]:03d}_{self.xy_label[1]:03d}_{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}.jpg")
             PIL_Image.fromarray(img).save(img_path)
             self.get_logger().info(f"saved {msg.width}x{msg.height} image to '{img_path}'")
+            self.get_logger().info(f"there are {len(fnmatch.filter(os.listdir(self.data_path), '*.jpg'))} images in the dataset")
             
         self.collect = False
         self.xy_label = None
