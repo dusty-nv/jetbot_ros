@@ -5,9 +5,9 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import ThisLaunchFileDir,LaunchConfiguration
+from launch.substitutions import ThisLaunchFileDir, LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -32,9 +32,11 @@ def generate_launch_description():
                         ],
                         output='screen', emulate_tty=True)
     
+    rtp_output = DeclareLaunchArgument('rtp_output', default_value="DUSTINF-LT1.fios-router.home:1234")
+    
     video_output = Node(package='ros_deep_learning', node_executable='video_output',
                         parameters=[
-                            {"resource": "rtp://sky-x4e2.fios-router.home:1234"},
+                            {"resource": ["rtp://", LaunchConfiguration('rtp_output')]},
                             {"codec": "h264"},
                         ],
                         remappings=[
@@ -45,6 +47,7 @@ def generate_launch_description():
     return LaunchDescription([
         motor_controller,
         oled_controller,
+        rtp_output,
         video_source,
         video_output
     ])
