@@ -82,13 +82,17 @@ class NavigationModel:
         self.model.cuda()
         
         # warmup model inference
+        print(f"=> running model warm-up")
+        
         for i in range(warmup):
             self.model.eval()
             
             with torch.no_grad():
                 input = torch.ones((1, 3, resolution, resolution)).cuda()
                 output = self.model(input)
-            
+        
+        print(f"=> done with model warm-up")
+        
     @property
     def classification(self):
         return self.type == 'classification'

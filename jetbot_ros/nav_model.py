@@ -48,11 +48,14 @@ class NavModelNode(Node):
         self.get_logger().debug(f"recieved image:  {msg.width}x{msg.height}, {msg.encoding}")
         #self.get_logger().debug(str(msg.header))
 
-        if msg.encoding != 'rgb8':
-            raise ValueError(f"image encoding is '{msg.encoding}' (expected rgb8)")
+        if msg.encoding != 'rgb8' and msg.encoding != 'bgr8':
+            raise ValueError(f"image encoding is '{msg.encoding}' (expected rgb8 or bgr8)")
             
         img = np.frombuffer(msg.data, dtype=np.uint8).reshape(msg.height, msg.width, -1)
 
+        if msg.encoding == 'bgr8':
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            
         # predict the center point
         xy = self.model.infer(PIL.Image.fromarray(img))
         
