@@ -37,7 +37,9 @@ class NavModelNode(Node):
         
         self.get_logger().info(f"model = {model_path}")
         self.get_logger().info(f"type = {model_type}")
-
+        self.get_logger().info(f"speed_gain = {self.get_parameter('speed_gain').value}")
+        self.get_logger().info(f"steering_gain = {self.get_parameter('steering_gain').value}")
+        
         if model_path is None:
             raise ValueError('must specify PyTorch model path parameter (e.g. model:=/path/to/your/model.pth)')
         
