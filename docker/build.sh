@@ -9,7 +9,8 @@
 # Also you should set your docker default-runtime to nvidia:
 #     https://github.com/dusty-nv/jetson-containers#docker-default-runtime
 #
-BASE_IMAGE=$1
+ROS_DISTRO=${1:-"foxy"}
+BASE_IMAGE=$2
 
 # break on errors
 set -e
@@ -18,7 +19,7 @@ set -e
 source docker/tag.sh
 
 if [ -z $BASE_IMAGE ]; then
-	BASE_IMAGE="dustynv/jetson-inference:$TAG"
+	BASE_IMAGE="dustynv/ros:$ROS_DISTRO-ros-base-pytorch-l4t-$TAG"
 fi
 
 
@@ -35,8 +36,4 @@ build_container()
 			.
 }
 
-build_container "jetbot_ros:eloquent-$TAG" "Dockerfile.eloquent"
-build_container "jetbot_ros:foxy-$TAG" "Dockerfile.foxy"
-
-# galactic not building due to errors in gazebo_plugins package
-#build_container "jetbot_ros:galactic-$TAG" "Dockerfile.galactic"
+build_container "jetbot_ros:$ROS_DISTRO-$TAG" "Dockerfile"
