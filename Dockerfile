@@ -34,6 +34,7 @@ SHELL ["/bin/bash", "-c"]
 ENV SHELL /bin/bash
 
 ENV DEBIAN_FRONTEND=noninteractive
+ARG MAKEFLAGS=-j$(nproc)
 ENV LANG=en_US.UTF-8 
 ENV PYTHONIOENCODING=utf-8
 RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
@@ -80,16 +81,96 @@ ENV GAZEBO_MASTER_URI=http://localhost:11346
 
 # setup workspace
 WORKDIR ${WORKSPACE_ROOT}
+RUN mkdir -p ${WORKSPACE_ROOT}/src
 
 COPY scripts/setup_workspace.sh ${WORKSPACE_ROOT}/setup_workspace.sh
 ENV PYTHONPATH="${JETBOT_ROOT}:${PYTHONPATH}"
 
 
 #
+# rtabmap - https://github.com/introlab/rtabmap_ros/tree/ros2
+#
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+		  libpcl-dev \
+		  libpython3-dev \
+		  python3-dev \
+		  software-properties-common \
+		  apt-transport-https \
+		  ca-certificates \
+		  gnupg \
+		  libsuitesparse-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# upgrade cmake - https://stackoverflow.com/a/56690743
+RUN wget -qO - https://apt.kitware.com/keys/kitware-archive-latest.asc | apt-key add - && \
+    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' && \
+    apt-get update && \
+    apt-get install -y --only-upgrade --no-install-recommends \
+            cmake \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && cmake --version
+    
+# install recommended dependencies - https://github.com/introlab/rtabmap/wiki/Installation#dependencies 
+# TODO build https://github.com/DrTimothyAldenDavis/SuiteSparse from source for CUDA if any advantage?
+RUN git clone https://github.com/RainerKuemmerle/g2o /tmp/g2o && \
+    cd /tmp/g2o && \
+    mkdir build && \
+    cd build && \
+    cmake -DBUILD_WITH_MARCH_NATIVE=OFF -DG2O_BUILD_APPS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENGL=OFF .. && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf /tmp/g2o
+    
+RUN git clone https://github.com/borglab/gtsam /tmp/gtsam && \
+    cd /tmp/gtsam && \
+    mkdir build && \
+    cd build && \
+    cmake -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF -DGTSAM_WITH_TBB=OFF .. && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf /tmp/gtsam
+    
+RUN git clone https://github.com/ethz-asl/libnabo /tmp/libnabo && \
+    cd /tmp/libnabo && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf /tmp/libnabo
+    
+RUN git clone https://github.com/ethz-asl/libpointmatcher /tmp/libpointmatcher && \
+    cd /tmp/libpointmatcher && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf /tmp/libpointmatcher
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+	libyaml-cpp-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# build rtabmap / rtabmap_ros
+RUN source ${ROS_ENVIRONMENT} && \
+    cd ${WORKSPACE_ROOT}/src && \
+    git clone https://github.com/introlab/rtabmap.git rtabmap && \
+    git clone --branch ros2 https://github.com/introlab/rtabmap_ros.git rtabmap_ros && \
+    cd ../ && \
+    colcon build --symlink-install --event-handlers console_direct+ \
+			  --cmake-args -DWITH_PYTHON=ON -DWITH_TORCH=ON -DTorch_DIR=/usr/local/lib/python3.6/dist-packages/torch/share/cmake/Torch
+    
+    
+#
 # ros_deep_learning package
 #
 RUN source ${ROS_ENVIRONMENT} && \
-    mkdir -p ${WORKSPACE_ROOT}/src && \
     cd ${WORKSPACE_ROOT}/src && \
     git clone https://github.com/dusty-nv/ros_deep_learning && \
     cd ../ && \
