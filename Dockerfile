@@ -86,7 +86,7 @@ RUN mkdir -p ${WORKSPACE_ROOT}/src
 COPY scripts/setup_workspace.sh ${WORKSPACE_ROOT}/setup_workspace.sh
 ENV PYTHONPATH="${JETBOT_ROOT}:${PYTHONPATH}"
 
-
+    
 #
 # rtabmap - https://github.com/introlab/rtabmap_ros/tree/ros2
 #
@@ -158,13 +158,54 @@ RUN apt-get update && \
     && apt-get clean
 
 # build rtabmap / rtabmap_ros
+RUN git clone https://github.com/introlab/rtabmap.git /opt/rtabmap && \
+    cd /opt/rtabmap/build && \
+    cmake -DWITH_PYTHON=ON -DWITH_TORCH=ON -DTorch_DIR=/usr/local/lib/python3.6/dist-packages/torch/share/cmake/Torch .. && \
+    make -j$(nproc) && \
+    make install
+
+#
+# Fix broken package.xml in test_pluginlib that crops up if/when rosdep is run again
+#
+#   Error(s) in package '/opt/ros/foxy/build/pluginlib/prefix/share/test_pluginlib/package.xml':
+#   Package 'test_pluginlib' must declare at least one maintainer
+#   The package node must contain at least one "license" tag
+#
+RUN TEST_PLUGINLIB_PACKAGE="${ROS_ROOT}/build/pluginlib/prefix/share/test_pluginlib/package.xml" && \
+    sed -i '/<\/description>/a <license>BSD<\/license>' $TEST_PLUGINLIB_PACKAGE && \
+    sed -i '/<\/description>/a <maintainer email="michael@openrobotics.org">Michael Carroll<\/maintainer>' $TEST_PLUGINLIB_PACKAGE && \
+    cat $TEST_PLUGINLIB_PACKAGE
+
+# since rtabmap_ros is an 'unreleased' package for ros2, manually pull it's dependencies from
+# https://github.com/introlab/rtabmap_ros/blob/dfdbe1f68314e851e017c8af3788b17518a5000b/package.xml#L24
 RUN source ${ROS_ENVIRONMENT} && \
-    cd ${WORKSPACE_ROOT}/src && \
-    git clone https://github.com/introlab/rtabmap.git rtabmap && \
-    git clone --branch ros2 https://github.com/introlab/rtabmap_ros.git rtabmap_ros && \
-    cd ../ && \
-    colcon build --symlink-install --event-handlers console_direct+ \
-			  --cmake-args -DWITH_PYTHON=ON -DWITH_TORCH=ON -DTorch_DIR=/usr/local/lib/python3.6/dist-packages/torch/share/cmake/Torch
+    cd ${WORKSPACE_ROOT} && \
+    rosinstall_generator --deps --exclude-path /opt/ros/${ROS_DISTRO}/src --rosdistro ${ROS_DISTRO} \
+		laser_geometry \
+		pcl_conversions \
+		rviz_common \
+		rviz_rendering \
+		rviz_default_plugins \
+	> ${ROS_DISTRO}.rtabmap.rosinstall && \
+    cat ${ROS_DISTRO}.rtabmap.rosinstall && \
+    vcs import src < ${ROS_DISTRO}.rtabmap.rosinstall && \
+    apt-get update && \
+    rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv" && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \
+    colcon build --symlink-install
+
+ENV PYTORCH_PATH="/usr/local/lib/python3.6/dist-packages/torch"
+ENV LD_LIBRARY_PATH="${PYTORCH_PATH}/lib:${LD_LIBRARY_PATH}"
+
+# build rtabmap_ros, but first patch it to import tf2_geometry_msgs correctly
+RUN source ${ROS_ENVIRONMENT} && \
+    cd ${WORKSPACE_ROOT} && \
+    git clone --branch ros2 https://github.com/introlab/rtabmap_ros.git src/rtabmap_ros && \
+    sed -i '/find_package(tf2_ros REQUIRED)/a find_package(tf2_geometry_msgs REQUIRED)' src/rtabmap_ros/CMakeLists.txt && \
+    sed -i '/   tf2_ros/a tf2_geometry_msgs' src/rtabmap_ros/CMakeLists.txt && \
+    cat src/rtabmap_ros/CMakeLists.txt && \
+    colcon build --symlink-install --packages-select rtabmap_ros --event-handlers console_direct+
     
     
 #
