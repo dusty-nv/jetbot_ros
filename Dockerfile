@@ -86,6 +86,46 @@ RUN mkdir -p ${WORKSPACE_ROOT}/src
 COPY scripts/setup_workspace.sh ${WORKSPACE_ROOT}/setup_workspace.sh
 ENV PYTHONPATH="${JETBOT_ROOT}:${PYTHONPATH}"
 
+  
+
+#
+# orbslam2 - https://github.com/alsora/ros2-ORB_SLAM2
+#
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+            ffmpeg \
+            libglew-dev \
+		  libboost-all-dev \
+		  libboost-system-dev \
+		  libcanberra-gtk-module \
+            libsuitesparse-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# pangolin
+RUN git clone https://github.com/stevenlovegrove/Pangolin /tmp/pangolin && \
+    cd /tmp/pangolin && \
+    mkdir build && \
+    cd build && \
+    cmake ../ && \
+    make -j$(nproc) && \
+    make install 
+    
+# orbslam2 (use Windfisch fork for OpenCV4 support)
+# note:  this does NOT use CUDA - see https://github.com/thien94/ORB_SLAM2_CUDA
+ENV ORB_SLAM2_ROOT_DIR="/opt/ORB_SLAM2"
+RUN git clone https://github.com/Windfisch/ORB_SLAM2 ${ORB_SLAM2_ROOT_DIR} && \
+    cd ${ORB_SLAM2_ROOT_DIR} && \
+    wget --no-check-certificate https://github.com/alsora/ros2-ORB_SLAM2/raw/master/docker/scripts/build.sh && \
+    wget --no-check-certificate https://github.com/alsora/ros2-ORB_SLAM2/raw/master/docker/scripts/orbslam.patch && \
+    git apply orbslam.patch && \
+    bash build.sh 
+    
+# ros2_orbslam
+RUN source ${ROS_ENVIRONMENT} && \
+    cd ${WORKSPACE_ROOT} && \
+    git clone https://github.com/alsora/ros2-ORB_SLAM2 src/ros2-ORB_SLAM2 && \
+    colcon build --symlink-install --packages-select ros2_orbslam --event-handlers console_direct+
     
 #
 # rtabmap - https://github.com/introlab/rtabmap_ros/tree/ros2
@@ -115,14 +155,15 @@ RUN wget -qO - https://apt.kitware.com/keys/kitware-archive-latest.asc | apt-key
     
 # install recommended dependencies - https://github.com/introlab/rtabmap/wiki/Installation#dependencies 
 # TODO build https://github.com/DrTimothyAldenDavis/SuiteSparse from source for CUDA if any advantage?
-RUN git clone https://github.com/RainerKuemmerle/g2o /tmp/g2o && \
-    cd /tmp/g2o && \
-    mkdir build && \
-    cd build && \
-    cmake -DBUILD_WITH_MARCH_NATIVE=OFF -DG2O_BUILD_APPS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENGL=OFF .. && \
-    make -j$(nproc) && \
-    make install && \
-    rm -rf /tmp/g2o
+# note:  disable g2o when using orbslam, because orbslam has its own g2o
+#RUN git clone https://github.com/RainerKuemmerle/g2o /tmp/g2o && \
+#    cd /tmp/g2o && \
+#    mkdir build && \
+#    cd build && \
+#    cmake -DBUILD_WITH_MARCH_NATIVE=OFF -DG2O_BUILD_APPS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENGL=OFF .. && \
+#    make -j$(nproc) && \
+#    make install && \
+#    rm -rf /tmp/g2o
     
 RUN git clone https://github.com/borglab/gtsam /tmp/gtsam && \
     cd /tmp/gtsam && \
@@ -160,7 +201,7 @@ RUN apt-get update && \
 # build rtabmap / rtabmap_ros
 RUN git clone https://github.com/introlab/rtabmap.git /opt/rtabmap && \
     cd /opt/rtabmap/build && \
-    cmake -DWITH_PYTHON=ON -DWITH_TORCH=ON -DTorch_DIR=/usr/local/lib/python3.6/dist-packages/torch/share/cmake/Torch .. && \
+    cmake -DWITH_PYTHON=ON -DWITH_ORB_SLAM=ON -DWITH_G2O=OFF -DWITH_TORCH=ON -DTorch_DIR=/usr/local/lib/python3.6/dist-packages/torch/share/cmake/Torch .. && \
     make -j$(nproc) && \
     make install
 
