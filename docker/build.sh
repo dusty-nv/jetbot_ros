@@ -19,7 +19,7 @@ set -e
 source docker/tag.sh
 
 if [ -z $BASE_IMAGE ]; then
-	BASE_IMAGE="dustynv/ros:$ROS_DISTRO-ros-base-pytorch-l4t-$TAG"
+	BASE_IMAGE="dustynv/ros:$ROS_DISTRO-slam-l4t-$TAG"
 fi
 
 
