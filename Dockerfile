@@ -27,7 +27,7 @@
 #     https://github.com/dusty-nv/jetson-containers#docker-default-runtime
 #
 
-ARG BASE_IMAGE=dustynv/ros:foxy-slam-l4t-r32.5.0
+ARG BASE_IMAGE=dustynv/ros:foxy-pytorch-l4t-r32.5.0
 FROM ${BASE_IMAGE}
 
 SHELL ["/bin/bash", "-c"] 
