@@ -2,7 +2,7 @@
 <sdf version='1.6'>
 	<model name="ground_plane_grass">
 		<static>true</static>
-		<link name='path'>
+		<link name='ground_plane_grass'>
 			<collision name='collision'>
 				<geometry>
 					<mesh>

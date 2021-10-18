@@ -43,7 +43,7 @@ WORKDIR /tmp
 
 
 #
-# install utilities
+# install gazebo & utilities
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -51,6 +51,10 @@ RUN apt-get update && \
 		  xterm \
 		  lxterminal \
 		  blender \
+		  libgazebo9-dev \
+		  gazebo9 \
+		  gazebo9-common \
+		  gazebo9-plugin-base \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -62,6 +66,32 @@ RUN git clone https://github.com/dusty-nv/py3gazebo /opt/py3gazebo && \
 ENV PYTHONPATH=/opt/py3gazebo
    
    
+#
+# Gazebo plugins for ROS
+#
+RUN source ${ROS_ROOT}/install/setup.bash && \
+    export ROS_PACKAGE_PATH=${AMENT_PREFIX_PATH} && \
+    cd ${ROS_ROOT} && \
+    mkdir -p src/gazebo && \
+    rosinstall_generator --deps --exclude RPP --rosdistro ${ROS_DISTRO} \
+          gazebo_ros_pkgs \
+	> ros2.${ROS_DISTRO}.gazebo.rosinstall && \
+    cat ros2.${ROS_DISTRO}.gazebo.rosinstall && \
+    vcs import src/gazebo < ros2.${ROS_DISTRO}.gazebo.rosinstall && \
+    apt-get update && \
+    rosdep install -y \
+       --ignore-src \
+       --from-paths src/gazebo \
+	  --rosdistro ${ROS_DISTRO} \
+	  --skip-keys "gazebo11 libgazebo11-dev libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv" && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \
+    colcon build --merge-install --base-paths src/gazebo \
+    && rm -rf ${ROS_ROOT}/src \
+    && rm -rf ${ROS_ROOT}/logs \
+    && rm -rf ${ROS_ROOT}/build 
+    
+
 #
 # JetBot hw controllers
 #

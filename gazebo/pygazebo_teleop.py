@@ -31,6 +31,7 @@ parser.add_argument('--camera', default='camera_link', type=str)
 parser.add_argument('--left-wheel', default='left_wheel_hinge', type=str)
 parser.add_argument('--right-wheel', default='right_wheel_hinge', type=str)
 parser.add_argument('--max-speed', default=2.0, type=float)
+parser.add_argument('--acceleration', default=0.01, type=float)
 
 args = parser.parse_args()
 print(args)
@@ -90,22 +91,6 @@ print('publications')
 for topic in manager.publications():
     print('  ', topic)
 
-# subscribe to topics
-def on_image(data):
-    msg = pygazebo.msg.image_stamped_pb2.ImageStamped()
-    msg.ParseFromString(data)
-    
-    img = np.frombuffer(msg.image.data, dtype=np.uint8)
-    img = np.reshape(img, (msg.image.height, msg.image.width, 3))
-    
-    #print(msg.time)
-    #print(f'width={msg.image.width} height={msg.image.height} pixel_format={msg.image.pixel_format} step={msg.image.step}')
-    #print(img.shape)
-    #print('')
-    #Image.fromarray(img).save('data/test_image.jpg')
-
-image_subscriber = gazebo_subscribe(manager, f'/gazebo/default/{args.robot}/{args.camera}/camera/image', 'gazebo.msgs.ImageStamped', on_image)
- 
 # advertise topics
 joint_publisher = gazebo_advertise(manager, f'/gazebo/default/{args.robot}/joint_cmd', 'gazebo.msgs.JointCmd')
 
@@ -139,11 +124,14 @@ keyboard_listener.start()
 #
 # robot control
 #
-wheel_speed = {'left': None, 'right': None}
+wheel_speed = {'left': 0.0, 'right': 0.0}
 
 def set_wheel_speed(left, right):
     global wheel_speed
     changed_speed = False
+    
+    left = min(max(left, -args.max_speed), args.max_speed)
+    right = min(max(right, -args.max_speed), args.max_speed)
     
     if wheel_speed['left'] != left:
         left_msg = pygazebo.msg.joint_cmd_pb2.JointCmd()
@@ -163,20 +151,41 @@ def set_wheel_speed(left, right):
         
     if changed_speed:
         print(f"set_wheel_speed({left}, {right})")
-    
-def teleop(max_speed=1.0):
-    if key_states.get(keyboard.Key.left) or key_states.get('a'):
-        set_wheel_speed(-max_speed, max_speed)
-    elif key_states.get(keyboard.Key.right) or key_states.get('d'):
-        set_wheel_speed(max_speed, -max_speed)
-    elif key_states.get(keyboard.Key.up) or key_states.get('w'):
-        set_wheel_speed(max_speed, max_speed)
-    elif key_states.get(keyboard.Key.down) or key_states.get('s'):
-        set_wheel_speed(-max_speed, -max_speed)
-    else:
-        set_wheel_speed(0,0)
         
-
+def teleop():
+    
+    left = wheel_speed['left']
+    right = wheel_speed['right']
+    
+    if key_states.get(keyboard.Key.left) or key_states.get('a'):
+        set_wheel_speed(left - args.acceleration, right + args.acceleration)
+    elif key_states.get(keyboard.Key.right) or key_states.get('d'):
+        set_wheel_speed(left + args.acceleration, right - args.acceleration)
+    elif key_states.get(keyboard.Key.up) or key_states.get('w'):
+        set_wheel_speed(left + args.acceleration, right + args.acceleration)
+    elif key_states.get(keyboard.Key.down) or key_states.get('s'):
+        set_wheel_speed(left - args.acceleration, right - args.acceleration)
+    else:
+        def to_zero(vel):
+            if vel < -args.acceleration:  vel += args.acceleration
+            elif vel > args.acceleration: vel -= args.acceleration
+            else:                         vel = 0
+            return vel
+            
+        set_wheel_speed(to_zero(left), to_zero(right))
+    """   
+    if key_states.get(keyboard.Key.left) or key_states.get('a'):
+        set_wheel_speed(-args.max_speed, args.max_speed)
+    elif key_states.get(keyboard.Key.right) or key_states.get('d'):
+        set_wheel_speed(args.max_speed, -args.max_speed)
+    elif key_states.get(keyboard.Key.up) or key_states.get('w'):
+        set_wheel_speed(args.max_speed, args.max_speed)
+    elif key_states.get(keyboard.Key.down) or key_states.get('s'):
+        set_wheel_speed(-args.max_speed, -args.max_speed)
+    else:
+        set_wheel_speed(0.0, 0.0)
+    """
+    
 #
 # main loop
 #
@@ -192,7 +201,7 @@ signal.signal(signal.SIGINT, signal_handler)
 # main loop
 async def run():
     while run_signal:
-        teleop(args.max_speed)
+        teleop()
         await asyncio.sleep(0.1)
  
     print('Shutting down, stopping robot...')
