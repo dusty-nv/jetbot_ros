@@ -60,7 +60,7 @@ It's recommended to view the camera feed in Gazebo by going to `Window -> Topic 
 
 Then drive the robot and press the `C` key to capture an image.  Then annotate that image in the pop-up window by clicking the center point of the path.  Repeat this all the way around the track.  It's important to also collect data of when the robot gets off-course (i.e. near the edges of the track, or completely off the track).  This way, the JetBot will know how to get back on track.
 
-Press Ctrl+C when you're done collecting data.
+Press Ctrl+C when you're done collecting data to quit.
 
 ### Train Navigation Model
 
