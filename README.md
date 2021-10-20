@@ -1,12 +1,12 @@
 # jetbot_ros
 ROS2 nodes and Gazebo model for NVIDIA JetBot with Jetson Nano
 
-> note:  if you want to use ROS Melodic, see the `melodic` branch
+> note:  if you want to use ROS Melodic, see the [`melodic`](https://github.com/dusty-nv/jetbot_ros/tree/melodic) branch
 
 ### Start the JetBot ROS2 Foxy container
 
 ``` bash
-git clone -b dev https://github.com/dusty-nv/jetbot_ros
+git clone https://github.com/dusty-nv/jetbot_ros
 cd jetbot_ros
 docker/run.sh
 ```
@@ -81,5 +81,5 @@ ros2 launch jetbot_ros nav_model.launch.py model:=/workspace/src/jetbot_ros/data
 
 > note:  to reset the position of the robot in the Gazebo environment, press `Ctrl+R`
 
-<a href="https://youtu.be/gok9pvUzZeY" target="_blank"><img src=https://github.com/dusty-nv/jetbot_ros/raw/dev/docs/images/jetbot_gazebo_sim.jpg width="750"></a>
+<a href="https://youtu.be/gok9pvUzZeY" target="_blank"><img src=https://github.com/dusty-nv/jetbot_ros/raw/dev/docs/images/jetbot_gazebo_sim_video.jpg width="750"></a>
 
