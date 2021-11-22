@@ -124,6 +124,7 @@ include_directories(
 )
 
 include_directories(/usr/include/gstreamer-1.0 /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include/ /usr/lib/aarch64-linux-gnu/glib-2.0/include/ /usr/lib/x86_64-linux-gnu/glib-2.0/include/)
+link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 add_definitions(-DROS1)
 
 # camera node
