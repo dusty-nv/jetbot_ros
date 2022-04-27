@@ -95,7 +95,7 @@ RUN source ${ROS_ROOT}/install/setup.bash && \
 #
 # JetBot hw controllers
 #
-RUN pip3 install Adafruit-MotorHAT Adafruit-SSD1306 --verbose
+RUN pip3 install Adafruit-MotorHAT Adafruit-SSD1306 pyserial sparkfun-qwiic --verbose
 
 
 #
