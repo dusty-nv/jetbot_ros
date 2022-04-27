@@ -19,6 +19,11 @@ If you have a real JetBot, you can start the camera / motors like so:
 ros2 launch jetbot_ros jetbot_nvidia.launch.py
 ```
 
+or (for a Sparkfun Jetbot)
+``` bash
+ros2 launch jetbot_ros jetbot_sparkfun.launch.py
+```
+
 Otherwise, see the [`Launch Gazebo`](#launch-gazebo) section below to run the simulator.
 
 ### Launch Gazebo
