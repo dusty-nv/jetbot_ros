@@ -16,6 +16,9 @@ def generate_launch_description():
                            emulate_tty=True)
     
     motor_controller = Node(package='jetbot_ros', node_executable='motors_sparkfun',
+                            output='screen', emulate_tty=True)              
+     
+    oled_controller = Node(package='jetbot_ros', node_executable='oled_sparkfun',
                             output='screen', emulate_tty=True)  
     
     video_source = Node(package='ros_deep_learning', node_executable='video_source',
@@ -46,6 +49,7 @@ def generate_launch_description():
     return LaunchDescription([
         teleop_keyboard,
         motor_controller,
+        oled_controller,
         rtp_output,
         video_source,
         video_output
