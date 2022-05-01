@@ -1,0 +1,50 @@
+mobile_base_controller:
+  type        : "diff_drive_controller/DiffDriveController"
+  left_wheel  : 'robot_left_wheel_hinge'
+  right_wheel : 'robot_right_wheel_hinge'
+  publish_rate: 50.0               # default: 50
+  pose_covariance_diagonal : [0.001, .001, 1000000., 1000000., 1000000., 1000.]
+  twist_covariance_diagonal: [0.001, .001, 1000000., 1000000., 1000000., 1000.]
+ 
+  # Wheel separation and diameter. These are both optional.
+  # diff_drive_controller will attempt to read either one or both from the
+  # URDF if not specified as a parameter
+  wheel_separation : 0.1025
+  wheel_radius : 0.03
+ 
+  # Wheel separation and radius multipliers
+  wheel_separation_multiplier: 4.0 # default: 1.0
+  wheel_radius_multiplier    : 0.075 # default: 1.0
+
+  # Odometry to commands calibration, used for dead reckoning
+  v_multiplier : 0.0125
+  w_multiplier : 0.05
+ 
+  # Velocity commands timeout [s], default 0.5
+  cmd_vel_timeout: 0.25
+
+  enable_odom_tf: true
+ 
+  # Base frame_id
+  base_frame_id: robot__chassis #default: base_link
+ 
+  # Velocity and acceleration limits
+  # Whenever a min_* is unspecified, default to -max_*
+  linear:
+    x:
+      has_velocity_limits    : true
+      max_velocity           : 0.5  # m/s
+      min_velocity           : -0.5 # m/s
+      has_acceleration_limits: true
+      max_acceleration       : 1.0  # m/s^2
+      min_acceleration       : -1.0 # m/s^2
+      has_jerk_limits        : true
+      max_jerk               : 5.0  # m/s^3
+  angular:
+    z:
+      has_velocity_limits    : true
+      max_velocity           : 1.7  # rad/s
+      has_acceleration_limits: true
+      max_acceleration       : 1.5  # rad/s^2
+      has_jerk_limits        : true
+      max_jerk               : 2.5  # rad/s^3

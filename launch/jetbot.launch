@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="model" default="$(find jetbot_ros)/model/jetbot.urdf"/>
+  <arg name="gui" default="true"/>
+  <arg name="rvizconfig" default="$(find jetbot_ros)/rviz/urdf.rviz" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="laserlink_broadcaster" args="0.05 0 0.03 0 0 0 robot__chassis base_laser" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="chassis_broadcaster" args="0 0 0 0 0 0 base_link robot__chassis" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="odom_broadcaster" args="0 0 0 0 0 0 odom map" /> 
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)"/>
+  <param name="use_gui" value="gui"/>
+  
+  <node name="laser_node" pkg="urg_node" type="urg_node" >
+    <param name="serial_port" value="/dev/ttyACM0"/>
+    <param name="frame_id" value="base_laser"/>
+  </node>
+  
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
+
+  <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find jetbot_ros)/map/test_map.yaml"/> -->
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="map_base_broadcaster" args="0 0 0 0 0 0 map base_link" /> -->
+  
+  <node name="motor_controller" pkg="jetbot_ros" type="jetbot_controller" output="screen"/> <!--output="screen"/> -->
+
+  <rosparam file="$(find jetbot_ros)/config/diff_drive.yaml" command="load" />
+  <node name="jetbot_controller_manager" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="mobile_base_controller"/>
+  
+</launch>
